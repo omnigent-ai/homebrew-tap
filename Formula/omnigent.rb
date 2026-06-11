@@ -8,6 +8,7 @@ class Omnigent < Formula
 
   depends_on "node"
   depends_on "python@3.13"
+  depends_on "tmux"
 
   # Dependencies are resolved from PyPI at build time instead of being
   # vendored as resources.
