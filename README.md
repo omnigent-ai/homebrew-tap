@@ -15,7 +15,7 @@ The upstream repository has no tagged releases yet, so the formula is
 HEAD-only and builds from the latest `main`:
 
 ```sh
-brew install --HEAD omnigent-ai/homebrew-tap/omnigent
+brew install --HEAD omnigent-ai/tap/omnigent
 ```
 
 To pick up new upstream commits later:
