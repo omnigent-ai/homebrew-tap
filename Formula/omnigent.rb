@@ -2,9 +2,9 @@ class Omnigent < Formula
   include Language::Python::Virtualenv
 
   desc "Meta-harness for AI agents"
-  homepage "https://github.com/Omnigents/omnigents"
+  homepage "https://github.com/omnigent-ai/omnigent"
   license "Apache-2.0"
-  head "https://github.com/Omnigents/omnigents.git", branch: "main"
+  head "https://github.com/omnigent-ai/omnigent.git", branch: "main"
 
   depends_on "node"
   depends_on "python@3.13"
@@ -30,7 +30,7 @@ class Omnigent < Formula
     # must be resolved together in a single pip invocation.
     system libexec/"bin/python", "-m", "pip", "install",
            buildpath, buildpath/"sdks/python-client", buildpath/"sdks/ui"
-    bin.install_symlink libexec/"bin/omnigents", libexec/"bin/omni"
+    bin.install_symlink libexec/"bin/omnigent", libexec/"bin/omni"
 
     %w[omnigents omni].each do |cmd|
       generate_completions_from_executable(libexec/"bin/#{cmd}",
@@ -39,6 +39,6 @@ class Omnigent < Formula
   end
 
   test do
-    system bin/"omnigents", "--help"
+    system bin/"omnigent", "--help"
   end
 end

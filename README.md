@@ -1,13 +1,13 @@
 # Omnigent Homebrew Tap
 
-Homebrew formulae for [Omnigents](https://github.com/omnigent-ai/omnigent).
+Homebrew formulae for [Omnigent](https://github.com/omnigent-ai/omnigent).
 
 ## Formulae
 
 ### omnigents
 
-Installs the [Omnigents](https://github.com/Omnigents/omnigents) CLI
-(`omnigents` and its `omni` alias) into a self-contained virtualenv built
+Installs the [Omnigent](https://github.com/omnigent-ai/omnigent) CLI
+(`omnigent` and its `omni` alias) into a self-contained virtualenv built
 with Homebrew's Python, plus shell completions for bash, zsh, and fish.
 No `uv` or pre-existing Python setup required.
 
@@ -15,13 +15,13 @@ The upstream repository has no tagged releases yet, so the formula is
 HEAD-only and builds from the latest `main`:
 
 ```sh
-brew install --HEAD omnigent-ai/tap/omnigents
+brew install --HEAD omnigent-ai/homebrew-tap/omnigent
 ```
 
 To pick up new upstream commits later:
 
 ```sh
-brew upgrade --fetch-HEAD omnigents
+brew upgrade --fetch-HEAD omnigent
 ```
 
 Cloning the private source repository uses your existing git credentials
