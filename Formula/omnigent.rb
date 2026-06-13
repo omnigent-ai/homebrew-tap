@@ -3,6 +3,8 @@ class Omnigent < Formula
 
   desc "Meta-harness for AI agents"
   homepage "https://github.com/omnigent-ai/omnigent"
+  url "https://github.com/omnigent-ai/omnigent/archive/refs/tags/v0.1.0.tar.gz"
+  sha256 "3fc803be99fbf461f45cc89c4434fed75212ff0680bc6a8fcae1c1e2eab3dff0"
   license "Apache-2.0"
   head "https://github.com/omnigent-ai/omnigent.git", branch: "main"
 
@@ -26,14 +28,22 @@ class Omnigent < Formula
     end
 
     virtualenv_create(libexec, "python3.13")
-    # omnigents-client and omnigents-ui-sdk are uv path dependencies with no
-    # PyPI releases and a circular dependency on omnigents, so all three
-    # must be resolved together in a single pip invocation.
-    system libexec/"bin/python", "-m", "pip", "install",
-           buildpath, buildpath/"sdks/python-client", buildpath/"sdks/ui"
+    if build.head?
+      # From source: omnigent-client and omnigent-ui-sdk are path dependencies
+      # with a circular dependency on omnigent, so all three must be resolved
+      # together in one pip invocation. This builds the web UI from source (npm).
+      system libexec/"bin/python", "-m", "pip", "install",
+             buildpath, buildpath/"sdks/python-client", buildpath/"sdks/ui"
+    else
+      # Stable: install the published release by name+version. This pulls the
+      # prebuilt py3-none-any wheel (web UI bundled) plus its lockstep
+      # omnigent-client / omnigent-ui-sdk siblings from PyPI, so nothing builds
+      # from source. The tagged tarball above only anchors the version/checksum.
+      system libexec/"bin/python", "-m", "pip", "install", "omnigent==#{version}"
+    end
     bin.install_symlink libexec/"bin/omnigent", libexec/"bin/omni"
 
-    %w[omnigents omni].each do |cmd|
+    %w[omnigent omni].each do |cmd|
       generate_completions_from_executable(libexec/"bin/#{cmd}",
                                            base_name: cmd, shell_parameter_format: :click)
     end
