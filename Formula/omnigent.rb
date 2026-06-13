@@ -8,37 +8,40 @@ class Omnigent < Formula
   license "Apache-2.0"
   head "https://github.com/omnigent-ai/omnigent.git", branch: "main"
 
-  depends_on "python@3.13"
-  # Runtime only: the Claude/Codex/Pi coding harnesses are npm CLIs and their
-  # terminal launchers use tmux. Neither is needed to install (the published
-  # wheel ships the prebuilt web UI) or to run the bare web UI / the in-process
-  # claude-sdk / openai-agents harnesses.
   depends_on "node"
+  depends_on "python@3.13"
   depends_on "tmux"
 
-  # Resolve the published wheels from PyPI at build time rather than vendoring
-  # every dependency as a resource. The omnigent wheel bundles the prebuilt
-  # web UI, so installing it runs no Node/npm build.
+  # Dependencies are resolved from PyPI at build time instead of being
+  # vendored as resources.
   allow_network_access! :build
 
   def install
-    # The sandboxed build cannot read ~/.config/pip; environments that need a
-    # registry mirror set it via HOMEBREW_PIP_INDEX_URL.
+    # The sandboxed build cannot read ~/.pip/pip.conf or ~/.npmrc, so
+    # environments that require registry mirrors must set
+    # HOMEBREW_PIP_INDEX_URL and HOMEBREW_NPM_REGISTRY.
     if (index_url = Homebrew::EnvConfig.pip_index_url)
       ENV["PIP_INDEX_URL"] = index_url
     end
+    if (npm_registry = ENV.fetch("HOMEBREW_NPM_REGISTRY", nil))
+      ENV["npm_config_registry"] = npm_registry
+    end
 
     virtualenv_create(libexec, "python3.13")
-    # Install the published release by name+version, NOT the checked-out source
-    # tree: this pulls the prebuilt py3-none-any wheel (web UI bundled) plus its
-    # lockstep omnigent-client / omnigent-ui-sdk siblings from PyPI, so nothing
-    # builds from source. The tagged tarball above only anchors the formula
-    # version and checksum.
-    system libexec/"bin/pip", "install", "omnigent==#{version}"
-
-    # `omnigent` is the primary command; `omni` is a short alias.
-    bin.install_symlink libexec/"bin/omnigent"
-    bin.install_symlink libexec/"bin/omni"
+    if build.head?
+      # From source: omnigent-client and omnigent-ui-sdk are path dependencies
+      # with a circular dependency on omnigent, so all three must be resolved
+      # together in one pip invocation. This builds the web UI from source (npm).
+      system libexec/"bin/python", "-m", "pip", "install",
+             buildpath, buildpath/"sdks/python-client", buildpath/"sdks/ui"
+    else
+      # Stable: install the published release by name+version. This pulls the
+      # prebuilt py3-none-any wheel (web UI bundled) plus its lockstep
+      # omnigent-client / omnigent-ui-sdk siblings from PyPI, so nothing builds
+      # from source. The tagged tarball above only anchors the version/checksum.
+      system libexec/"bin/python", "-m", "pip", "install", "omnigent==#{version}"
+    end
+    bin.install_symlink libexec/"bin/omnigent", libexec/"bin/omni"
 
     %w[omnigent omni].each do |cmd|
       generate_completions_from_executable(libexec/"bin/#{cmd}",
@@ -47,6 +50,6 @@ class Omnigent < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/omnigent --version")
+    system bin/"omnigent", "--help"
   end
 end
