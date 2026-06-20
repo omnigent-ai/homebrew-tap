@@ -8,6 +8,9 @@ class Omnigent < Formula
   license "Apache-2.0"
   head "https://github.com/omnigent-ai/omnigent.git", branch: "main"
 
+  # jiter (a Rust extension, transitive via anthropic) is compiled from source
+  # so it can be linked with header padding — see the RUSTFLAGS note in #install.
+  depends_on "rust" => :build
   depends_on "node"
   depends_on "python@3.13"
   depends_on "tmux"
@@ -17,6 +20,15 @@ class Omnigent < Formula
   allow_network_access! :build
 
   def install
+    # The prebuilt jiter arm64 wheel (transitive via anthropic) is linked
+    # without -headerpad_max_install_names, so its Mach-O header has no room
+    # for Homebrew to rewrite the dylib id to the absolute libexec path during
+    # relocation — `brew install` then errors with "Failed to fix install
+    # linkage" (omnigent-ai/omnigent#866). Build jiter from source (see the
+    # `--no-binary jiter` flags below) with header padding so the relink fits.
+    # Remove this and the rust build dep once jiter ships padded wheels upstream.
+    ENV.append "RUSTFLAGS", "-C link-arg=-Wl,-headerpad_max_install_names"
+
     # The sandboxed build cannot read ~/.pip/pip.conf or ~/.npmrc, so
     # environments that require registry mirrors must set
     # HOMEBREW_PIP_INDEX_URL and HOMEBREW_NPM_REGISTRY.
@@ -32,14 +44,14 @@ class Omnigent < Formula
       # From source: omnigent-client and omnigent-ui-sdk are path dependencies
       # with a circular dependency on omnigent, so all three must be resolved
       # together in one pip invocation. This builds the web UI from source (npm).
-      system libexec/"bin/python", "-m", "pip", "install",
+      system libexec/"bin/python", "-m", "pip", "install", "--no-binary", "jiter",
              buildpath, buildpath/"sdks/python-client", buildpath/"sdks/ui"
     else
       # Stable: install the published release by name+version. This pulls the
       # prebuilt py3-none-any wheel (web UI bundled) plus its lockstep
       # omnigent-client / omnigent-ui-sdk siblings from PyPI, so nothing builds
       # from source. The tagged tarball above only anchors the version/checksum.
-      system libexec/"bin/python", "-m", "pip", "install", "omnigent==#{version}"
+      system libexec/"bin/python", "-m", "pip", "install", "--no-binary", "jiter", "omnigent==#{version}"
     end
     bin.install_symlink libexec/"bin/omnigent", libexec/"bin/omni"
 
