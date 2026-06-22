@@ -3,8 +3,8 @@ class Omnigent < Formula
 
   desc "Meta-harness for AI agents"
   homepage "https://github.com/omnigent-ai/omnigent"
-  url "https://files.pythonhosted.org/packages/a8/d7/b13b8180fbae210d65adcaddd0841d80acf5db55ebaccd16944b7bcab6f3/omnigent-0.1.1.tar.gz"
-  sha256 "efde6d77485a6de133de29213e1ad7ff29c54d05425b55460cad580b81884269"
+  url "https://files.pythonhosted.org/packages/0d/8e/0ac178a3747da1b888c0bf57bfecf85ab93075331936c659fef4d88cd079/omnigent-0.2.0.tar.gz"
+  sha256 "c7638d1f8c7e2f75967a343520a090a87abfe76e42d02c606985e98ea5f5f2f6"
   license "Apache-2.0"
 
   # Compiled-dependency build backends: cel-expr-python's C++ extensions are
@@ -12,7 +12,10 @@ class Omnigent < Formula
   # repo-pinned Bazel 8.5.1 is used (its rules predate Bazel 9). The Rust
   # toolchain builds cryptography, pydantic-core, rpds-py, jiter, and watchfiles.
   depends_on "bazelisk" => :build
+  depends_on "pkgconf" => :build
   depends_on "rust" => :build
+  depends_on "libyaml"
+  depends_on "openssl@3"
   depends_on "python@3.13"
   depends_on "tmux"
 
@@ -32,8 +35,8 @@ class Omnigent < Formula
   end
 
   resource "anyio" do
-    url "https://files.pythonhosted.org/packages/19/14/2c5dd9f512b66549ae92767a9c7b330ae88e1932ca57876909410251fe13/anyio-4.13.0.tar.gz"
-    sha256 "334b70e641fd2221c1505b3890c69882fe4a2df910cba14d97019b90b24439dc"
+    url "https://files.pythonhosted.org/packages/1c/b5/001890774a9552aff22502b8da382593109ce0c95314abaebbb116567545/anyio-4.14.0.tar.gz"
+    sha256 "b47c1f9ccf73e67021df785332508f99379c68fa7d0684e8e3492cb1d4b23f89"
   end
 
   resource "argon2-cffi" do
@@ -62,8 +65,8 @@ class Omnigent < Formula
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/f3/ce/ee2ecad540810a79593028e88299baeae54d346cc7a0d94b6199988b89b1/certifi-2026.5.20.tar.gz"
-    sha256 "69dea482ab64caa7b9f6aba1c6bf48bb6a5448d1c0f1b17ab42ad8c763a5344d"
+    url "https://files.pythonhosted.org/packages/c9/c7/424b75da314c1045981bd9777432fad05a9e0c69daa4ed7e308bbaffe405/certifi-2026.6.17.tar.gz"
+    sha256 "024c88eeec92ca068db80f02b8b07c9cef7b9fe261d1d535abfd5abd6f6af432"
   end
 
   resource "cffi" do
@@ -77,8 +80,8 @@ class Omnigent < Formula
   end
 
   resource "claude-agent-sdk" do
-    url "https://files.pythonhosted.org/packages/fc/a2/50ba0002ef6ebfc3479244ce6fa309dfe914f57bf93df3faf72978d63249/claude_agent_sdk-0.2.97.tar.gz"
-    sha256 "9104d15df11be5c95d36331968d49b17f30f0bb802415a19495744931bd76613"
+    url "https://files.pythonhosted.org/packages/69/73/f5edec88b9548c3757e429dbfc62b16e46cac1300c9463cbb83ed5281266/claude_agent_sdk-0.2.106.tar.gz"
+    sha256 "26c20cf75db1ed609aae6217cb6dd40844365c66acf3a7abf4e877671695228e"
   end
 
   resource "click" do
@@ -87,8 +90,8 @@ class Omnigent < Formula
   end
 
   resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/12/45/870e7f4bef50e5f53b9f51d4428aee5290eedf58ba443f16b1ebb7ab8e66/cryptography-48.0.1.tar.gz"
-    sha256 "266f4ee051abb2f725b74ef8072b521ce1feacf685a3364fa6a6b45548db791a"
+    url "https://files.pythonhosted.org/packages/1f/99/d1c90d6041656cc6ee229dc99cd67fd0cd5aec3c5f7d72fffc27cc750054/cryptography-49.0.0.tar.gz"
+    sha256 "f89660a348f4f78a92366240a61404e337586ef7f5909a2fef59ca88ef505493"
   end
 
   resource "distro" do
@@ -97,8 +100,8 @@ class Omnigent < Formula
   end
 
   resource "fastapi" do
-    url "https://files.pythonhosted.org/packages/81/2d/ff8d91d7b564d464629a0fd50a4489c97fcb836ac230bf3a7269232a9b1f/fastapi-0.136.3.tar.gz"
-    sha256 "e487fae93ad408e6f47641ee4dfe389864fd7bec92e547ea8498fc13f43e83ab"
+    url "https://files.pythonhosted.org/packages/5b/58/ff455d9fe47c60abadb34b9e05a304b1f05f5ab8000ac01565156b6f5e43/fastapi-0.138.0.tar.gz"
+    sha256 "d445a4877636ad191e7053e08c9bf98cb921a6756776848400bb773d1740c061"
   end
 
   resource "ftfy" do
@@ -112,8 +115,8 @@ class Omnigent < Formula
   end
 
   resource "griffelib" do
-    url "https://files.pythonhosted.org/packages/9d/82/74f4a3310cdabfbb10da554c3a672847f1ed33c6f61dd472681ce7f1fe67/griffelib-2.0.2.tar.gz"
-    sha256 "3cf20b3bc470e83763ffbf236e0076b1211bac1bc67de13daf494640f2de707e"
+    url "https://files.pythonhosted.org/packages/33/e4/8d187ea29c2e30b3a09505c567513077d6117861bde1fbd997a167f262ec/griffelib-2.1.0.tar.gz"
+    sha256 "762a186d2c6fd6794d4ea20d428d597ffb857cb56b66421651cbba15bdd5e813"
   end
 
   resource "grpcio" do
@@ -186,7 +189,7 @@ class Omnigent < Formula
     sha256 "fe01bd85eb3f8fb3dd0405defdeac9a5b4f6f0439edbb3149577f244a2e8245b"
   end
 
-  resource "Mako" do
+  resource "mako" do
     url "https://files.pythonhosted.org/packages/00/62/791b31e69ae182791ec67f04850f2f062716bbd205483d63a215f3e062d3/mako-1.3.12.tar.gz"
     sha256 "9f778e93289bd410bb35daadeb4fc66d95a746f0b75777b942088b7fd7af550a"
   end
@@ -196,14 +199,14 @@ class Omnigent < Formula
     sha256 "04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49"
   end
 
-  resource "MarkupSafe" do
+  resource "markupsafe" do
     url "https://files.pythonhosted.org/packages/7e/99/7690b6d4034fffd95959cbe0c02de8deb3098cc577c67bb6a24fe5d7caa7/markupsafe-3.0.3.tar.gz"
     sha256 "722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698"
   end
 
   resource "mcp" do
-    url "https://files.pythonhosted.org/packages/27/3c/347cf965d313f5d41764e7d46bea6ffe7d9ef13b983cc429b0340962a082/mcp-1.27.2.tar.gz"
-    sha256 "8e02db104096d1c25b28e64bde29a5c32b31bc241710213e12fd4d84985bdfef"
+    url "https://files.pythonhosted.org/packages/c1/ee/94c6c50ffc5b5cf4737052275d11b57367f32d1a8516e31dcd60591b3916/mcp-1.28.0.tar.gz"
+    sha256 "559d3f9943674cafbe5744c5d3794f3237e8b47f9bbc58e20c0fad680d8487c2"
   end
 
   resource "mdurl" do
@@ -217,23 +220,23 @@ class Omnigent < Formula
   end
 
   resource "omnigent-client" do
-    url "https://files.pythonhosted.org/packages/74/d8/7d56f8729d70399ace2864c9a1cec56d5f347d89b7ecb21f6b8178d3da36/omnigent_client-0.1.1.tar.gz"
-    sha256 "4102b617dae976637d8f8ef3a089255ed9e4a85b8af63fb169fe88114def6d4b"
+    url "https://files.pythonhosted.org/packages/f4/ab/895be231dd207081cddfa8149a2178bb6b5978208193d86814cbb31afd5c/omnigent_client-0.2.0.tar.gz"
+    sha256 "7f26f5dd995615147c144c61345c4edceddeccaf13c8181f3c8394f1363902bc"
   end
 
   resource "omnigent-ui-sdk" do
-    url "https://files.pythonhosted.org/packages/bb/5c/b29c62d638747af2f0ea147d6861b905b83b63a795e0086c6a15d92e64b9/omnigent_ui_sdk-0.1.1.tar.gz"
-    sha256 "0db176f78597f25ae60049853d9fcbe01d87bf479f3019b0a032cc367612ab50"
+    url "https://files.pythonhosted.org/packages/47/40/997a3204bac20ad5d40050d90d6ea15f6163f055841fc3686ab25599e25f/omnigent_ui_sdk-0.2.0.tar.gz"
+    sha256 "e3ffe9c3150d73f4a8a5375ce86c8eea1b2ffbcd59e48ac36a6beb66b6b97ea6"
   end
 
   resource "openai" do
-    url "https://files.pythonhosted.org/packages/40/36/4c926a91554483977608951360c18c2e911592785eb87a6437813f6123f7/openai-2.41.1.tar.gz"
-    sha256 "23d617a0432457ad844973bee8f540be9da90894f7c5686852d2d365da058f57"
+    url "https://files.pythonhosted.org/packages/f3/fa/88d0c58a0c58df7e6758e66b99c5d028d5e0bb49f8812d7203940cd9dbf1/openai-2.43.0.tar.gz"
+    sha256 "e74d238200a26868977002190fb6631613480a93dfe0c9c982e77021ed60a017"
   end
 
   resource "openai-agents" do
-    url "https://files.pythonhosted.org/packages/72/fe/ef185f2a21f2fba1b0b107f72a7646bb51369d4c4025e2ab4d1ec65764f3/openai_agents-0.17.5.tar.gz"
-    sha256 "5dd46943b993e1a68a78acd254fc6a00cf0455fc3dcc802078ea26964b14278c"
+    url "https://files.pythonhosted.org/packages/fb/90/724f368d1f0656dc750a0b6d3ba06ad88efb293be8d43b08e9d32956252b/openai_agents-0.17.6.tar.gz"
+    sha256 "fed94f8cf0eb4c57c63a89ad4b107932d75f2a0b6d9e895c88fa3c217e63c822"
   end
 
   resource "opentelemetry-api" do
@@ -336,22 +339,22 @@ class Omnigent < Formula
     sha256 "c40756b57adaa8b1efeeced5c196f3f3b7c435f90e84ea7f443901bec8099ef6"
   end
 
-  resource "pydantic-settings" do
-    url "https://files.pythonhosted.org/packages/07/60/1d1e59c9c90d54591469ada7d268251f71c24bdb765f1a8a832cee8c6653/pydantic_settings-2.14.1.tar.gz"
-    sha256 "e874d3bec7e787b0c9958277956ed9b4dd5de6a80e162188fdaff7c5e26fd5fa"
-  end
-
   resource "pydantic-core" do
     url "https://files.pythonhosted.org/packages/9d/56/921726b776ace8d8f5db44c4ef961006580d91dc52b803c489fafd1aa249/pydantic_core-2.46.4.tar.gz"
     sha256 "62f875393d7f270851f20523dd2e29f082bcc82292d66db2b64ea71f64b6e1c1"
   end
 
-  resource "Pygments" do
+  resource "pydantic-settings" do
+    url "https://files.pythonhosted.org/packages/5c/b5/8f48e906c3e0205276e8bd8cb7512217a87b2685304d64be27cad5b3019f/pydantic_settings-2.14.2.tar.gz"
+    sha256 "c19dd64b19097f1de80184f0cc7b0272a13ae6e170cbf240a3e27e381ed14a5f"
+  end
+
+  resource "pygments" do
     url "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152d655522fdcebac55e66de6603a76a02bca1b6414f6c/pygments-2.20.0.tar.gz"
     sha256 "6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"
   end
 
-  resource "PyJWT" do
+  resource "pyjwt" do
     url "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz"
     sha256 "41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423"
   end
@@ -371,7 +374,7 @@ class Omnigent < Formula
     sha256 "be54b7f3fa167bb83e4fcd936b887b708f4e57fe75911c02aebf53efaf8d938e"
   end
 
-  resource "PyYAML" do
+  resource "pyyaml" do
     url "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz"
     sha256 "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"
   end
@@ -392,8 +395,8 @@ class Omnigent < Formula
   end
 
   resource "rich" do
-    url "https://files.pythonhosted.org/packages/ab/3a/0316b28d0761c6734d6bc14e770d85506c986c85ffb239e688eeaab2c2bc/rich-13.9.4.tar.gz"
-    sha256 "439594978a49a09530cff7ebc4b5c7103ef57baf48d5ea3184f21d9a2befa098"
+    url "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz"
+    sha256 "817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9"
   end
 
   resource "rpds-py" do
@@ -406,14 +409,14 @@ class Omnigent < Formula
     sha256 "f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"
   end
 
-  resource "SQLAlchemy" do
-    url "https://files.pythonhosted.org/packages/57/da/6fbf010c8ebb347679d0d100b22fe9ba5e13fd04046c5df7280d2f0bf706/sqlalchemy-2.0.50.tar.gz"
-    sha256 "af5607d11ef90fd6a5c0549fe0045dce1663d427426bcfb506dcb5346a85a3b9"
+  resource "sqlalchemy" do
+    url "https://files.pythonhosted.org/packages/02/f1/a7a892f18d4d224e6b26f706531eafccc41e37594d37d304786969ee13cb/sqlalchemy-2.0.51.tar.gz"
+    sha256 "804dccd8a4a6242c4e30ad961e540e18a588f6527202f2d6791b01845d59fdc9"
   end
 
   resource "sse-starlette" do
-    url "https://files.pythonhosted.org/packages/f7/2b/58abc2d1fd397e7dde08e947e05c884d8ef2f78d5e2588c17a12d42d6994/sse_starlette-3.4.4.tar.gz"
-    sha256 "07e0fa0460138baf25cdd5fb28683472c3995dc1642225191b3832d62526bcb0"
+    url "https://files.pythonhosted.org/packages/d2/1b/bc9e3e7a72dcdad7dc7888758f5d00f56f8909ed5cfdff822bd72bb4c520/sse_starlette-3.4.5.tar.gz"
+    sha256 "83072538bc211a2f68b7b0422226c4af3e9b62e106e07034664b832ca019842a"
   end
 
   resource "starlette" do
@@ -432,8 +435,8 @@ class Omnigent < Formula
   end
 
   resource "tqdm" do
-    url "https://files.pythonhosted.org/packages/85/05/0d5260f1f1ca784f4a4a0def9cbe6affe587f5b4025328d446c3d67765f4/tqdm-4.68.2.tar.gz"
-    sha256 "89c230e8dbc67c7615c142487111222f878c77427ea09549960f62389e258add"
+    url "https://files.pythonhosted.org/packages/87/d7/0535a28b1f5f24f6612fb3ff1e89fb1a8d160fee0f976e0aa6803862134b/tqdm-4.68.3.tar.gz"
+    sha256 "00dfa48452b6b6cfae3dd9885636c23d3422d1ec97c66d96818cbd5e0821d482"
   end
 
   resource "types-requests" do
@@ -441,14 +444,14 @@ class Omnigent < Formula
     sha256 "df7bd3bfe0ca8402dfb841e7d9be714bb5578203283d66d7dc4ef69343449a5e"
   end
 
-  resource "typing-inspection" do
-    url "https://files.pythonhosted.org/packages/55/e3/70399cb7dd41c10ac53367ae42139cf4b1ca5f36bb3dc6c9d33acdb43655/typing_inspection-0.4.2.tar.gz"
-    sha256 "ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464"
-  end
-
   resource "typing-extensions" do
     url "https://files.pythonhosted.org/packages/72/94/1a15dd82efb362ac84269196e94cf00f187f7ed21c242792a923cdb1c61f/typing_extensions-4.15.0.tar.gz"
     sha256 "0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"
+  end
+
+  resource "typing-inspection" do
+    url "https://files.pythonhosted.org/packages/55/e3/70399cb7dd41c10ac53367ae42139cf4b1ca5f36bb3dc6c9d33acdb43655/typing_inspection-0.4.2.tar.gz"
+    sha256 "ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464"
   end
 
   resource "urllib3" do
@@ -482,8 +485,8 @@ class Omnigent < Formula
   end
 
   resource "wrapt" do
-    url "https://files.pythonhosted.org/packages/2d/9f/06263fcd8ad6c405f05a3905fd7a84dd3176eb5ad46e44bccc0cd16348bb/wrapt-2.2.1.tar.gz"
-    sha256 "6744f504375775d7609c82c8d3d94af1c9a6f05586984536905908ba905277b9"
+    url "https://files.pythonhosted.org/packages/fe/a4/282c8e64300a59fc834518a54bf0afabb4ff9218b5fa76958b450459a844/wrapt-2.2.2.tar.gz"
+    sha256 "0788e321027c999bf221b667bd4a54aaefd1a36283749a860ac3eb77daed0302"
   end
 
   # cel-expr-python has no PyPI sdist; build it from the upstream source release.
@@ -513,24 +516,44 @@ class Omnigent < Formula
         s.gsub!(/^build:macos --remote_cache=.*\n/, "")
         s.gsub!(/^build:macos --google_default_credentials=true\n/, "")
       end
-      # Pin Bazel's C/C++ toolchain to Apple clang. Bazel otherwise autodetects
-      # Homebrew's compiler shim, which cannot locate xcrun inside Bazel's
-      # sandboxed action environment.
+      # Pin Bazel's C/C++ toolchain to the real platform compiler. Bazel
+      # otherwise autodetects Homebrew's compiler shim, which fails inside
+      # Bazel's sandboxed action environment: on macOS the shim cannot locate
+      # xcrun, and on Linux it aborts ("The build tool has reset ENV; --env=std
+      # required.") because Bazel runs sandboxed actions with a cleared
+      # environment. Point Bazel at the underlying compilers the shims wrap.
+      # enable_platform_specific_config applies build:macos / build:linux per-OS.
       File.write ".bazelrc", <<~BAZELRC, mode: "a"
 
-        build --repo_env=CC=/usr/bin/clang
-        build --repo_env=CXX=/usr/bin/clang++
-        build --action_env=CC=/usr/bin/clang
-        build --action_env=CXX=/usr/bin/clang++
+        build:macos --repo_env=CC=/usr/bin/clang
+        build:macos --repo_env=CXX=/usr/bin/clang++
+        build:macos --action_env=CC=/usr/bin/clang
+        build:macos --action_env=CXX=/usr/bin/clang++
         build:macos --linkopt=-headerpad_max_install_names
       BAZELRC
+      if OS.linux?
+        # HOMEBREW_CC/CXX name the compilers behind the shim (e.g. gcc-13);
+        # resolve them to their real /usr/bin paths so Bazel bypasses the shim.
+        cc = "/usr/bin/#{ENV.fetch("HOMEBREW_CC", "cc")}"
+        cxx = "/usr/bin/#{ENV.fetch("HOMEBREW_CXX", "c++")}"
+        File.write ".bazelrc", <<~BAZELRC, mode: "a"
+          build:linux --repo_env=CC=#{cc}
+          build:linux --repo_env=CXX=#{cxx}
+          build:linux --action_env=CC=#{cc}
+          build:linux --action_env=CXX=#{cxx}
+        BAZELRC
+      end
       system libexec/"bin/python", "-m", "pip", "install", "--no-deps", "."
     end
 
     # The Rust extensions (cryptography, pydantic-core, rpds-py, jiter,
     # watchfiles) must leave Mach-O header padding so Homebrew can rewrite their
     # install names to the Cellar path during relocation.
-    ENV.append "RUSTFLAGS", "-C link-args=-Wl,-headerpad_max_install_names"
+    ENV.append "RUSTFLAGS", "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
+
+    # cryptography's openssl-sys crate locates OpenSSL via pkg-config, which
+    # cannot see keg-only openssl@3 on Linux. Point it at the keg directly.
+    ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
 
     venv.pip_install resources.reject { |r| r.name == "cel-expr-python" }
     venv.pip_install_and_link buildpath
