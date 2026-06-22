@@ -8,6 +8,11 @@ class Omnigent < Formula
   license "Apache-2.0"
   revision 2
 
+  bottle do
+    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.2.0_2"
+    sha256 cellar: :any, arm64_tahoe: "a1c28500e06aba587b8041bbc00bc40f3e65757639a7f6d12132f1bf65506422"
+  end
+
   # The Rust toolchain builds cryptography, pydantic-core, rpds-py, jiter, and
   # watchfiles from source.
   depends_on "pkgconf" => :build
