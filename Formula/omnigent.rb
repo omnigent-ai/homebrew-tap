@@ -6,18 +6,27 @@ class Omnigent < Formula
   url "https://files.pythonhosted.org/packages/0d/8e/0ac178a3747da1b888c0bf57bfecf85ab93075331936c659fef4d88cd079/omnigent-0.2.0.tar.gz"
   sha256 "c7638d1f8c7e2f75967a343520a090a87abfe76e42d02c606985e98ea5f5f2f6"
   license "Apache-2.0"
+  revision 1
 
-  # Compiled-dependency build backends: cel-expr-python's C++ extensions are
-  # built from source with Bazel (it has no PyPI sdist), via bazelisk so the
-  # repo-pinned Bazel 8.5.1 is used (its rules predate Bazel 9). The Rust
-  # toolchain builds cryptography, pydantic-core, rpds-py, jiter, and watchfiles.
-  depends_on "bazelisk" => :build
+  # The Rust toolchain builds cryptography, pydantic-core, rpds-py, jiter, and
+  # watchfiles from source.
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
   depends_on "libyaml"
   depends_on "openssl@3"
   depends_on "python@3.13"
   depends_on "tmux"
+  # cel-expr-python ships an arm64 macOS wheel but no x86_64 wheel and no PyPI
+  # sdist, so every other platform builds its C++ extensions from source with
+  # Bazel (run through bazelisk); arm64 macOS needs no Bazel toolchain.
+  on_macos do
+    on_intel do
+      depends_on "bazelisk" => :build
+    end
+  end
+  on_linux do
+    depends_on "bazelisk" => :build
+  end
 
   resource "alembic" do
     url "https://files.pythonhosted.org/packages/94/13/8b084e0f2efb0275a1d534838844926f798bd766566b1375174e2448cd31/alembic-1.18.4.tar.gz"
@@ -489,66 +498,89 @@ class Omnigent < Formula
     sha256 "0788e321027c999bf221b667bd4a54aaefd1a36283749a860ac3eb77daed0302"
   end
 
-  # cel-expr-python has no PyPI sdist; build it from the upstream source release.
-  # Its C++ extensions are built with Bazel via a setuptools shim in release/.
+  # cel-expr-python publishes binary wheels but no PyPI sdist. arm64 macOS uses
+  # the prebuilt wheel; other platforms build from the upstream source release.
   resource "cel-expr-python" do
-    url "https://github.com/cel-expr/cel-python/archive/refs/tags/v0.1.2.tar.gz"
-    sha256 "23c4bd72dd8a8b73bddfd96579481b3280d1487641cc26916517f918d8577595"
+    on_macos do
+      on_arm do
+        url "https://files.pythonhosted.org/packages/59/79/75d0897dd2c3c9f20376ae7a369de7b528ba7064632621463f920ad52517/cel_expr_python-0.1.2-cp313-cp313-macosx_11_0_arm64.whl"
+        sha256 "a6c4e4218a4b18cc54c061f3bfc53f4cbac2ca8ae43a0c2fb2fdaa07cb7dae4d"
+      end
+      on_intel do
+        url "https://github.com/cel-expr/cel-python/archive/refs/tags/v0.1.2.tar.gz"
+        sha256 "23c4bd72dd8a8b73bddfd96579481b3280d1487641cc26916517f918d8577595"
+      end
+    end
+    on_linux do
+      url "https://github.com/cel-expr/cel-python/archive/refs/tags/v0.1.2.tar.gz"
+      sha256 "23c4bd72dd8a8b73bddfd96579481b3280d1487641cc26916517f918d8577595"
+    end
   end
 
   def install
     venv = virtualenv_create(libexec, "python3.13")
 
-    # Build cel-expr-python from source first. The packaging files live in
-    # release/; mirror upstream's build_wheel.sh: copy them to the source root,
-    # substitute the version, drop tests, then let its setuptools BazelBuild
-    # shim compile the C++ extensions with Bazel. The virtualenv is created with
-    # --without-pip, so invoke pip as a module; build isolation installs the
-    # setuptools backend (Homebrew's python does not ship it).
-    resource("cel-expr-python").stage do
-      cp "release/setup.py", "setup.py"
-      cp "release/pyproject.toml", "pyproject.toml"
-      inreplace "pyproject.toml", "$VERSION", "0.1.2"
-      rm Dir["cel_expr_python/*_test.py"]
-      # Upstream's .bazelrc auto-enables a Google Cloud remote cache on macOS
-      # that requires GCP credentials; drop it so the build runs locally.
-      inreplace ".bazelrc" do |s|
-        s.gsub!(/^build:macos --remote_cache=.*\n/, "")
-        s.gsub!(/^build:macos --google_default_credentials=true\n/, "")
-      end
-      # Pin Bazel's C/C++ toolchain to the real platform compiler. Bazel
-      # otherwise autodetects Homebrew's compiler shim, which fails inside
-      # Bazel's sandboxed action environment: on macOS the shim cannot locate
-      # xcrun, and on Linux it aborts ("The build tool has reset ENV; --env=std
-      # required.") because Bazel runs sandboxed actions with a cleared
-      # environment. Point Bazel at the underlying compilers the shims wrap.
-      # enable_platform_specific_config applies build:macos / build:linux per-OS.
-      File.write ".bazelrc", <<~BAZELRC, mode: "a"
-
-        build:macos --repo_env=CC=/usr/bin/clang
-        build:macos --repo_env=CXX=/usr/bin/clang++
-        build:macos --action_env=CC=/usr/bin/clang
-        build:macos --action_env=CXX=/usr/bin/clang++
-        build:macos --linkopt=-headerpad_max_install_names
-      BAZELRC
-      if OS.linux?
-        # HOMEBREW_CC/CXX name the compilers behind the shim (e.g. gcc-13);
-        # resolve them to their real /usr/bin paths so Bazel bypasses the shim.
-        cc = "/usr/bin/#{ENV.fetch("HOMEBREW_CC", "cc")}"
-        cxx = "/usr/bin/#{ENV.fetch("HOMEBREW_CXX", "c++")}"
+    cel = resource("cel-expr-python")
+    if OS.mac? && Hardware::CPU.arm?
+      # Prebuilt arm64 wheel. Copy the cached download to its canonical wheel
+      # filename and pip-install it directly; venv.pip_install would stage the
+      # binary wheel as a ZIP archive (unzip it) and then fail to install the
+      # extracted directory.
+      whl = buildpath/"cel_expr_python-0.1.2-cp313-cp313-macosx_11_0_arm64.whl"
+      cp cel.cached_download, whl
+      system libexec/"bin/python", "-m", "pip", "install", "--no-deps", whl
+    else
+      # No wheel for this platform: build the C++ extensions from source. The
+      # packaging files live in release/; mirror upstream's build_wheel.sh: copy
+      # them to the source root, substitute the version, drop tests, then let its
+      # setuptools BazelBuild shim compile with Bazel. The virtualenv is created
+      # with --without-pip, so invoke pip as a module; build isolation installs
+      # the setuptools backend (Homebrew's python does not ship it).
+      cel.stage do
+        cp "release/setup.py", "setup.py"
+        cp "release/pyproject.toml", "pyproject.toml"
+        inreplace "pyproject.toml", "$VERSION", "0.1.2"
+        rm Dir["cel_expr_python/*_test.py"]
+        # Upstream's .bazelrc auto-enables a Google Cloud remote cache on macOS
+        # that requires GCP credentials; drop it so the build runs locally.
+        inreplace ".bazelrc" do |s|
+          s.gsub!(/^build:macos --remote_cache=.*\n/, "")
+          s.gsub!(/^build:macos --google_default_credentials=true\n/, "")
+        end
+        # Pin Bazel's C/C++ toolchain to the real platform compiler. Bazel
+        # otherwise autodetects Homebrew's compiler shim, which fails inside
+        # Bazel's sandboxed action environment: on Intel macOS the shim cannot
+        # locate xcrun, and on Linux it aborts ("The build tool has reset ENV;
+        # --env=std required.") because Bazel clears the environment for
+        # sandboxed actions. Point Bazel at the compilers the shims wrap.
         File.write ".bazelrc", <<~BAZELRC, mode: "a"
-          build:linux --repo_env=CC=#{cc}
-          build:linux --repo_env=CXX=#{cxx}
-          build:linux --action_env=CC=#{cc}
-          build:linux --action_env=CXX=#{cxx}
+
+          build:macos --repo_env=CC=/usr/bin/clang
+          build:macos --repo_env=CXX=/usr/bin/clang++
+          build:macos --action_env=CC=/usr/bin/clang
+          build:macos --action_env=CXX=/usr/bin/clang++
+          build:macos --linkopt=-headerpad_max_install_names
         BAZELRC
+        if OS.linux?
+          # HOMEBREW_CC/CXX name the compilers behind the shim (e.g. gcc-13);
+          # resolve them to their real /usr/bin paths so Bazel bypasses it.
+          cc = "/usr/bin/#{ENV.fetch("HOMEBREW_CC", "cc")}"
+          cxx = "/usr/bin/#{ENV.fetch("HOMEBREW_CXX", "c++")}"
+          File.write ".bazelrc", <<~BAZELRC, mode: "a"
+            build:linux --repo_env=CC=#{cc}
+            build:linux --repo_env=CXX=#{cxx}
+            build:linux --action_env=CC=#{cc}
+            build:linux --action_env=CXX=#{cxx}
+          BAZELRC
+        end
+        system libexec/"bin/python", "-m", "pip", "install", "--no-deps", "."
       end
-      system libexec/"bin/python", "-m", "pip", "install", "--no-deps", "."
     end
 
     # The Rust extensions (cryptography, pydantic-core, rpds-py, jiter,
     # watchfiles) must leave Mach-O header padding so Homebrew can rewrite their
-    # install names to the Cellar path during relocation.
+    # install names to the Cellar path during relocation (macOS only; the flag
+    # breaks Linux ld).
     ENV.append "RUSTFLAGS", "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
 
     # cryptography's openssl-sys crate locates OpenSSL via pkg-config, which
