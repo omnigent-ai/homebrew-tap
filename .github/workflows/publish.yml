@@ -14,6 +14,7 @@ jobs:
       checks: read
       contents: write
       issues: read
+      packages: write
       pull-requests: write
     steps:
       - name: Set up Homebrew

@@ -11,11 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ macos-15-intel, macos-26 ]
-        include:
-          - os: ubuntu-latest
-            container: ghcr.io/homebrew/brew:main
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     permissions:
       actions: read
       checks: read
