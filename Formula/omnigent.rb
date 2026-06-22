@@ -6,12 +6,7 @@ class Omnigent < Formula
   url "https://files.pythonhosted.org/packages/0d/8e/0ac178a3747da1b888c0bf57bfecf85ab93075331936c659fef4d88cd079/omnigent-0.2.0.tar.gz"
   sha256 "c7638d1f8c7e2f75967a343520a090a87abfe76e42d02c606985e98ea5f5f2f6"
   license "Apache-2.0"
-  revision 1
-
-  bottle do
-    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.2.0_1"
-    sha256 cellar: :any, arm64_tahoe: "ad758d71347f0448b498cc8628f5009cc02938b992cfcfe3a36dbb68c831fd9f"
-  end
+  revision 2
 
   # The Rust toolchain builds cryptography, pydantic-core, rpds-py, jiter, and
   # watchfiles from source.
@@ -21,16 +16,41 @@ class Omnigent < Formula
   depends_on "openssl@3"
   depends_on "python@3.13"
   depends_on "tmux"
-  # cel-expr-python ships an arm64 macOS wheel but no x86_64 wheel and no PyPI
-  # sdist, so every other platform builds its C++ extensions from source with
-  # Bazel (run through bazelisk); arm64 macOS needs no Bazel toolchain.
+  # Platform-specific build deps and resources:
+  # - bazelisk builds cel-expr-python's C++ extensions from source where no wheel
+  #   exists (Intel macOS, Linux); arm64 macOS uses its prebuilt wheel.
+  # - google-antigravity (antigravity extra) ships platform wheels but no sdist and
+  #   no Intel-macOS build, so it is declared only where upstream supports it.
   on_macos do
     on_intel do
       depends_on "bazelisk" => :build
     end
+    on_arm do
+      resource "google-antigravity" do
+        url "https://files.pythonhosted.org/packages/89/e2/1c6f9d4ffb4d97088cac763fa0dd3604504283f4b8d3ea0c07ca33d9f1ee/google_antigravity-0.1.4-py3-none-macosx_11_0_arm64.whl"
+        sha256 "cb83022853d1021abffb103dec248cdff92fe0c6d0121f0229616f5524624d01"
+      end
+    end
   end
   on_linux do
     depends_on "bazelisk" => :build
+    on_arm do
+      resource "google-antigravity" do
+        url "https://files.pythonhosted.org/packages/f7/06/6d853664783e2b17ef2e95a6202add07a331e1dd55430341db257200c251/google_antigravity-0.1.4-py3-none-manylinux_2_17_aarch64.whl"
+        sha256 "4276600a2480cb24bf74f3334f082df2059019236766ea23b5af9f9e0e2a4ae0"
+      end
+    end
+    on_intel do
+      resource "google-antigravity" do
+        url "https://files.pythonhosted.org/packages/5f/72/6efc89b3aa36f85f583afa9b8214f3b758ec6cd056be5798c80f58861826/google_antigravity-0.1.4-py3-none-manylinux_2_17_x86_64.whl"
+        sha256 "cbc35edfff18a6795f46c096f8daf2a87653b1739ef4c63b01a04ba795223f95"
+      end
+    end
+  end
+
+  resource "absl-py" do
+    url "https://files.pythonhosted.org/packages/64/c7/8de93764ad66968d19329a7e0c147a2bb3c7054c554d4a119111b8f9440f/absl_py-2.4.0.tar.gz"
+    sha256 "8c6af82722b35cf71e0f4d1d47dcaebfff286e27110a99fc359349b247dfb5d4"
   end
 
   resource "alembic" do
@@ -108,6 +128,11 @@ class Omnigent < Formula
     sha256 "f89660a348f4f78a92366240a61404e337586ef7f5909a2fef59ca88ef505493"
   end
 
+  resource "cursor-sdk" do
+    url "https://files.pythonhosted.org/packages/d6/23/22aa3ef2f4eef082b145fe1d151e28f23f0d93f0f33051106584d1812e67/cursor_sdk-0.1.8.tar.gz"
+    sha256 "4e3ab986f3cbf9d98e7013a8a30299c077ff423b58c772a40be10222e1b3b898"
+  end
+
   resource "distro" do
     url "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz"
     sha256 "2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed"
@@ -121,6 +146,16 @@ class Omnigent < Formula
   resource "ftfy" do
     url "https://files.pythonhosted.org/packages/a5/d3/8650919bc3c7c6e90ee3fa7fd618bf373cbbe55dff043bd67353dbb20cd8/ftfy-6.3.1.tar.gz"
     sha256 "9b3c3d90f84fb267fe64d375a07b7f8912d817cf86009ae134aa03e1819506ec"
+  end
+
+  resource "google-auth" do
+    url "https://files.pythonhosted.org/packages/81/1c/70b23fc52b2bb3c70b379f3bd05c4a60ab3a873e30c6bd21c57e0154848a/google_auth-2.55.0.tar.gz"
+    sha256 "fcd3a130f575fa36403d38774af1c64a4fbfbca09215f0589d2372b5119697cb"
+  end
+
+  resource "google-genai" do
+    url "https://files.pythonhosted.org/packages/51/75/81c01294db3a3005dc8a807ed889a10ecd66ef89462c118adcffa5f7981c/google_genai-2.9.0.tar.gz"
+    sha256 "a8a10e9113f460cc668c1d9deeb62ba393ad1ba704bf3166d5a0f32a434f9415"
   end
 
   resource "googleapis-common-protos" do
@@ -343,6 +378,16 @@ class Omnigent < Formula
     sha256 "5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220"
   end
 
+  resource "pyasn1" do
+    url "https://files.pythonhosted.org/packages/5c/5f/6583902b6f79b399c9c40674ac384fd9cd77805f9e6205075f828ef11fb2/pyasn1-0.6.3.tar.gz"
+    sha256 "697a8ecd6d98891189184ca1fa05d1bb00e2f84b5977c481452050549c8a72cf"
+  end
+
+  resource "pyasn1-modules" do
+    url "https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-0.4.2.tar.gz"
+    sha256 "677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6"
+  end
+
   resource "pycparser" do
     url "https://files.pythonhosted.org/packages/1b/7d/92392ff7815c21062bea51aa7b87d45576f649f16458d78b7cf94b9ab2e6/pycparser-3.0.tar.gz"
     sha256 "600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"
@@ -436,6 +481,11 @@ class Omnigent < Formula
   resource "starlette" do
     url "https://files.pythonhosted.org/packages/c4/68/79977123bb7be889ad680d79a40f339082c1978b5cfcf62c2d8d196873ac/starlette-0.52.1.tar.gz"
     sha256 "834edd1b0a23167694292e94f597773bc3f89f362be6effee198165a35d62933"
+  end
+
+  resource "tenacity" do
+    url "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697ee8a44d3d69222b344920433d3b6666ccd9b374630c/tenacity-9.1.4.tar.gz"
+    sha256 "adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a"
   end
 
   resource "tiktoken" do
@@ -592,7 +642,18 @@ class Omnigent < Formula
     # cannot see keg-only openssl@3 on Linux. Point it at the keg directly.
     ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
 
-    venv.pip_install resources.reject { |r| r.name == "cel-expr-python" }
+    skip_resources = ["cel-expr-python", "google-antigravity"]
+    venv.pip_install resources.reject { |r| skip_resources.include?(r.name) }
+
+    # google-antigravity ships platform wheels (py3-none-<platform>, not -any) and
+    # no sdist, so install it like the cel-expr wheel wherever it is defined: copy
+    # the cached download to its real filename, then pip-install it directly.
+    if (ga = resources.find { |r| r.name == "google-antigravity" })
+      whl = buildpath/ga.url.split("/").last
+      cp ga.cached_download, whl
+      system libexec/"bin/python", "-m", "pip", "install", "--no-deps", whl
+    end
+
     venv.pip_install_and_link buildpath
 
     bin.install_symlink libexec/"bin/omnigent", libexec/"bin/omni"
