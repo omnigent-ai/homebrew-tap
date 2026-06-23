@@ -6,30 +6,32 @@ class Omnigent < Formula
   url "https://files.pythonhosted.org/packages/0d/8e/0ac178a3747da1b888c0bf57bfecf85ab93075331936c659fef4d88cd079/omnigent-0.2.0.tar.gz"
   sha256 "c7638d1f8c7e2f75967a343520a090a87abfe76e42d02c606985e98ea5f5f2f6"
   license "Apache-2.0"
-  revision 2
+  revision 3
 
   bottle do
-    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.2.0_2"
-    sha256 cellar: :any, arm64_tahoe: "a1c28500e06aba587b8041bbc00bc40f3e65757639a7f6d12132f1bf65506422"
+    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.2.0_3"
   end
 
-  # The Rust toolchain builds cryptography, pydantic-core, rpds-py, jiter, and
-  # watchfiles from source.
+  # The Rust toolchain builds jiter and watchfiles from source.
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
+  # certifi, cryptography, pydantic (which bundles pydantic-core), and rpds-py
+  # are provided by Homebrew formulae rather than built as virtualenv resources.
+  # The compiled ones would otherwise need a Rust/C build, and their transitive
+  # deps (cffi, pycparser) come along for free. The virtualenv is created with
+  # system site-packages, so it imports them from the brewed python. :no_linkage
+  # because they are Python imports, not libraries this formula links against.
+  depends_on "certifi" => :no_linkage
+  depends_on "cryptography" => :no_linkage
   depends_on "libyaml"
-  depends_on "openssl@3"
-  depends_on "python@3.13"
+  depends_on "pydantic" => :no_linkage
+  depends_on "python@3.14"
+  depends_on "rpds-py" => :no_linkage
   depends_on "tmux"
-  # Platform-specific build deps and resources:
-  # - bazelisk builds cel-expr-python's C++ extensions from source where no wheel
-  #   exists (Intel macOS, Linux); arm64 macOS uses its prebuilt wheel.
+  # Platform-specific resources:
   # - google-antigravity (antigravity extra) ships platform wheels but no sdist and
   #   no Intel-macOS build, so it is declared only where upstream supports it.
   on_macos do
-    on_intel do
-      depends_on "bazelisk" => :build
-    end
     on_arm do
       resource "google-antigravity" do
         url "https://files.pythonhosted.org/packages/89/e2/1c6f9d4ffb4d97088cac763fa0dd3604504283f4b8d3ea0c07ca33d9f1ee/google_antigravity-0.1.4-py3-none-macosx_11_0_arm64.whl"
@@ -38,7 +40,6 @@ class Omnigent < Formula
     end
   end
   on_linux do
-    depends_on "bazelisk" => :build
     on_arm do
       resource "google-antigravity" do
         url "https://files.pythonhosted.org/packages/f7/06/6d853664783e2b17ef2e95a6202add07a331e1dd55430341db257200c251/google_antigravity-0.1.4-py3-none-manylinux_2_17_aarch64.whl"
@@ -103,16 +104,6 @@ class Omnigent < Formula
     sha256 "16c33e1f276b9a9c0b49ab5782d901e3ad3de0dd6da9bf9bcd29ac5672f2f9e6"
   end
 
-  resource "certifi" do
-    url "https://files.pythonhosted.org/packages/c9/c7/424b75da314c1045981bd9777432fad05a9e0c69daa4ed7e308bbaffe405/certifi-2026.6.17.tar.gz"
-    sha256 "024c88eeec92ca068db80f02b8b07c9cef7b9fe261d1d535abfd5abd6f6af432"
-  end
-
-  resource "cffi" do
-    url "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz"
-    sha256 "44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529"
-  end
-
   resource "charset-normalizer" do
     url "https://files.pythonhosted.org/packages/e7/a1/67fe25fac3c7642725500a3f6cfe5821ad557c3abb11c9d20d12c7008d3e/charset_normalizer-3.4.7.tar.gz"
     sha256 "ae89db9e5f98a11a4bf50407d4363e7b09b31e55bc117b4f7d80aab97ba009e5"
@@ -126,11 +117,6 @@ class Omnigent < Formula
   resource "click" do
     url "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz"
     sha256 "ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a"
-  end
-
-  resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/1f/99/d1c90d6041656cc6ee229dc99cd67fd0cd5aec3c5f7d72fffc27cc750054/cryptography-49.0.0.tar.gz"
-    sha256 "f89660a348f4f78a92366240a61404e337586ef7f5909a2fef59ca88ef505493"
   end
 
   resource "cursor-sdk" do
@@ -393,21 +379,6 @@ class Omnigent < Formula
     sha256 "677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6"
   end
 
-  resource "pycparser" do
-    url "https://files.pythonhosted.org/packages/1b/7d/92392ff7815c21062bea51aa7b87d45576f649f16458d78b7cf94b9ab2e6/pycparser-3.0.tar.gz"
-    sha256 "600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"
-  end
-
-  resource "pydantic" do
-    url "https://files.pythonhosted.org/packages/18/a5/b60d21ac674192f8ab0ba4e9fd860690f9b4a6e51ca5df118733b487d8d6/pydantic-2.13.4.tar.gz"
-    sha256 "c40756b57adaa8b1efeeced5c196f3f3b7c435f90e84ea7f443901bec8099ef6"
-  end
-
-  resource "pydantic-core" do
-    url "https://files.pythonhosted.org/packages/9d/56/921726b776ace8d8f5db44c4ef961006580d91dc52b803c489fafd1aa249/pydantic_core-2.46.4.tar.gz"
-    sha256 "62f875393d7f270851f20523dd2e29f082bcc82292d66db2b64ea71f64b6e1c1"
-  end
-
   resource "pydantic-settings" do
     url "https://files.pythonhosted.org/packages/5c/b5/8f48e906c3e0205276e8bd8cb7512217a87b2685304d64be27cad5b3019f/pydantic_settings-2.14.2.tar.gz"
     sha256 "c19dd64b19097f1de80184f0cc7b0272a13ae6e170cbf240a3e27e381ed14a5f"
@@ -461,11 +432,6 @@ class Omnigent < Formula
   resource "rich" do
     url "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz"
     sha256 "817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9"
-  end
-
-  resource "rpds-py" do
-    url "https://files.pythonhosted.org/packages/2e/43/25a8dcd3feedd735039a8f0b5b7e3b118232b5eae288c4fd9ab200d41094/rpds_py-2026.5.1.tar.gz"
-    sha256 "07b24fea40541e28570e5b795a4a38fbdcd12550c06bd0748005ecc8116ca256"
   end
 
   resource "sniffio" do
@@ -558,101 +524,26 @@ class Omnigent < Formula
     sha256 "0788e321027c999bf221b667bd4a54aaefd1a36283749a860ac3eb77daed0302"
   end
 
-  # cel-expr-python publishes binary wheels but no PyPI sdist. arm64 macOS uses
-  # the prebuilt wheel; other platforms build from the upstream source release.
-  resource "cel-expr-python" do
-    on_macos do
-      on_arm do
-        url "https://files.pythonhosted.org/packages/59/79/75d0897dd2c3c9f20376ae7a369de7b528ba7064632621463f920ad52517/cel_expr_python-0.1.2-cp313-cp313-macosx_11_0_arm64.whl"
-        sha256 "a6c4e4218a4b18cc54c061f3bfc53f4cbac2ca8ae43a0c2fb2fdaa07cb7dae4d"
-      end
-      on_intel do
-        url "https://github.com/cel-expr/cel-python/archive/refs/tags/v0.1.2.tar.gz"
-        sha256 "23c4bd72dd8a8b73bddfd96579481b3280d1487641cc26916517f918d8577595"
-      end
-    end
-    on_linux do
-      url "https://github.com/cel-expr/cel-python/archive/refs/tags/v0.1.2.tar.gz"
-      sha256 "23c4bd72dd8a8b73bddfd96579481b3280d1487641cc26916517f918d8577595"
-    end
-  end
-
   def install
-    venv = virtualenv_create(libexec, "python3.13")
+    venv = virtualenv_create(libexec, "python3.14")
 
-    cel = resource("cel-expr-python")
-    if OS.mac? && Hardware::CPU.arm?
-      # Prebuilt arm64 wheel. Copy the cached download to its canonical wheel
-      # filename and pip-install it directly; venv.pip_install would stage the
-      # binary wheel as a ZIP archive (unzip it) and then fail to install the
-      # extracted directory.
-      whl = buildpath/"cel_expr_python-0.1.2-cp313-cp313-macosx_11_0_arm64.whl"
-      cp cel.cached_download, whl
-      system libexec/"bin/python", "-m", "pip", "install", "--no-deps", whl
-    else
-      # No wheel for this platform: build the C++ extensions from source. The
-      # packaging files live in release/; mirror upstream's build_wheel.sh: copy
-      # them to the source root, substitute the version, drop tests, then let its
-      # setuptools BazelBuild shim compile with Bazel. The virtualenv is created
-      # with --without-pip, so invoke pip as a module; build isolation installs
-      # the setuptools backend (Homebrew's python does not ship it).
-      cel.stage do
-        cp "release/setup.py", "setup.py"
-        cp "release/pyproject.toml", "pyproject.toml"
-        inreplace "pyproject.toml", "$VERSION", "0.1.2"
-        rm Dir["cel_expr_python/*_test.py"]
-        # Upstream's .bazelrc auto-enables a Google Cloud remote cache on macOS
-        # that requires GCP credentials; drop it so the build runs locally.
-        inreplace ".bazelrc" do |s|
-          s.gsub!(/^build:macos --remote_cache=.*\n/, "")
-          s.gsub!(/^build:macos --google_default_credentials=true\n/, "")
-        end
-        # Pin Bazel's C/C++ toolchain to the real platform compiler. Bazel
-        # otherwise autodetects Homebrew's compiler shim, which fails inside
-        # Bazel's sandboxed action environment: on Intel macOS the shim cannot
-        # locate xcrun, and on Linux it aborts ("The build tool has reset ENV;
-        # --env=std required.") because Bazel clears the environment for
-        # sandboxed actions. Point Bazel at the compilers the shims wrap.
-        File.write ".bazelrc", <<~BAZELRC, mode: "a"
+    # The Rust extensions (jiter, watchfiles) must leave Mach-O header padding so
+    # Homebrew can rewrite their install names to the Cellar path during
+    # relocation (macOS only; the flag breaks Linux ld).
+    ENV.append_to_rustflags "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
 
-          build:macos --repo_env=CC=/usr/bin/clang
-          build:macos --repo_env=CXX=/usr/bin/clang++
-          build:macos --action_env=CC=/usr/bin/clang
-          build:macos --action_env=CXX=/usr/bin/clang++
-          build:macos --linkopt=-headerpad_max_install_names
-        BAZELRC
-        if OS.linux?
-          # HOMEBREW_CC/CXX name the compilers behind the shim (e.g. gcc-13);
-          # resolve them to their real /usr/bin paths so Bazel bypasses it.
-          cc = "/usr/bin/#{ENV.fetch("HOMEBREW_CC", "cc")}"
-          cxx = "/usr/bin/#{ENV.fetch("HOMEBREW_CXX", "c++")}"
-          File.write ".bazelrc", <<~BAZELRC, mode: "a"
-            build:linux --repo_env=CC=#{cc}
-            build:linux --repo_env=CXX=#{cxx}
-            build:linux --action_env=CC=#{cc}
-            build:linux --action_env=CXX=#{cxx}
-          BAZELRC
-        end
-        system libexec/"bin/python", "-m", "pip", "install", "--no-deps", "."
-      end
-    end
+    # argon2-cffi-bindings' sdist ships an unprocessed .git_archival.txt that the
+    # (build-isolated, latest) setuptools-scm parses instead of falling back to
+    # PKG-INFO, so version detection fails. Pin the version it should report.
+    ENV["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_ARGON2_CFFI_BINDINGS"] =
+      resource("argon2-cffi-bindings").version.to_s
 
-    # The Rust extensions (cryptography, pydantic-core, rpds-py, jiter,
-    # watchfiles) must leave Mach-O header padding so Homebrew can rewrite their
-    # install names to the Cellar path during relocation (macOS only; the flag
-    # breaks Linux ld).
-    ENV.append "RUSTFLAGS", "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
-
-    # cryptography's openssl-sys crate locates OpenSSL via pkg-config, which
-    # cannot see keg-only openssl@3 on Linux. Point it at the keg directly.
-    ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
-
-    skip_resources = ["cel-expr-python", "google-antigravity"]
+    skip_resources = ["google-antigravity"]
     venv.pip_install resources.reject { |r| skip_resources.include?(r.name) }
 
     # google-antigravity ships platform wheels (py3-none-<platform>, not -any) and
-    # no sdist, so install it like the cel-expr wheel wherever it is defined: copy
-    # the cached download to its real filename, then pip-install it directly.
+    # no sdist, so install it directly wherever it is defined: copy the cached
+    # download to its real filename, then pip-install it.
     if (ga = resources.find { |r| r.name == "google-antigravity" })
       whl = buildpath/ga.url.split("/").last
       cp ga.cached_download, whl
@@ -671,5 +562,10 @@ class Omnigent < Formula
 
   test do
     system bin/"omnigent", "--help"
+
+    # certifi, cryptography, pydantic (with pydantic-core), and rpds-py are
+    # provided by Homebrew formulae and imported from the brewed python through
+    # the virtualenv's system site-packages; confirm they resolve in the venv.
+    system libexec/"bin/python", "-c", "import certifi, cryptography, pydantic, rpds"
   end
 end
