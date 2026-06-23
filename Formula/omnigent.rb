@@ -10,6 +10,8 @@ class Omnigent < Formula
 
   bottle do
     root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.2.0_3"
+    sha256 cellar: :any, arm64_tahoe:   "7a03559eaec04de1c805478ca211a21cccf0d163ea59b5d444f68eff711f3bd7"
+    sha256 cellar: :any, arm64_sequoia: "5d16b05452c527682b24d86881913bca050e7d26e2abde44fd4d211c028c47f7"
   end
 
   # The Rust toolchain builds jiter and watchfiles from source.
