@@ -27,6 +27,12 @@ class Omnigent < Formula
   sha256 "08383ab972b7c040ea54d4d01d5990241166109d79d1d757e9dfd63ca22a9cb3"
   license "Apache-2.0"
 
+  bottle do
+    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.5.1"
+    sha256 cellar: :any, arm64_tahoe:   "44f48d61ac323b241157c2ce58accb4e6ee75bdda0a51eb304fc7f5c27c14f50"
+    sha256 cellar: :any, arm64_sequoia: "a9d5fe8aa91c43bcb4b745f2141b02c4c153adbe527b7ef541f620ecbf92d5aa"
+  end
+
   # The Rust toolchain builds jiter and watchfiles from source.
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
