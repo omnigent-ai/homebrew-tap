@@ -113,8 +113,14 @@ class Omnigent < Formula
     sha256 "9b3c3d90f84fb267fe64d375a07b7f8912d817cf86009ae134aa03e1819506ec"
   end
   resource "google-re2" do
-    url "https://files.pythonhosted.org/packages/6b/60/805c654ba53d685513df955ee745f71920fe8e6a284faf0f9b9dc19b659c/google_re2-1.1.20251105.tar.gz"
-    sha256 "1db14a292ee8303b91e91e7c37e05ac17d3c467f29416c79ac70a78be3e65bda"
+    on_arm do
+      url "https://files.pythonhosted.org/packages/5e/7f/7eb238bdcd06182b5f427afd305cf413b7cf4ea71047308bbf35912cf923/google_re2-1.1.20251105-1-cp314-cp314-macosx_13_0_arm64.whl"
+      sha256 "cc151cf6a585d9ebe711da32b23683fcff40f78db8c8587c7f4b209ef4658809"
+    end
+    on_intel do
+      url "https://files.pythonhosted.org/packages/6d/62/eed28eab67f939f4b9383c47b1db11638ade6ac30785c15cb960de85ba43/google_re2-1.1.20251105-1-cp314-cp314-macosx_13_0_x86_64.whl"
+      sha256 "7e2186d2c90488c1e11895343941f35ca2f58e9ba6c6b034fd531abe22ef77cc"
+    end
   end
   resource "googleapis-common-protos" do
     url "https://files.pythonhosted.org/packages/b5/c8/f439cffde755cffa462bfbb156278fa6f9d09119719af9814b858fd4f81f/googleapis_common_protos-1.75.0.tar.gz"
@@ -459,7 +465,20 @@ class Omnigent < Formula
     ENV["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_ARGON2_CFFI_BINDINGS"] =
       resource("argon2-cffi-bindings").version.to_s
 
-    venv.pip_install resources
+    # Most resources are sdists Homebrew builds in place. google-re2 (required by
+    # cel-python, which backs CEL policy evaluation) is pinned to its upstream
+    # wheel instead: its sdist runs `bazel build` whenever GITHUB_ACTIONS is set,
+    # and the non-bazel path needs re2/abseil/pybind11 headers and C++17 that it
+    # never requests. Homebrew only auto-installs `py3-none-any` wheels, so copy
+    # each platform wheel's cached download back to its real filename and
+    # pip-install the file directly.
+    wheels, sdists = resources.partition { |r| r.url.end_with?(".whl") }
+    venv.pip_install sdists
+    wheels.each do |r|
+      whl = buildpath/r.url.split("/").last
+      cp r.cached_download, whl
+      venv.pip_install whl
+    end
 
     venv.pip_install_and_link buildpath
 
@@ -478,5 +497,10 @@ class Omnigent < Formula
     # provided by Homebrew formulae and imported from the brewed python through
     # the virtualenv's system site-packages; confirm they resolve in the venv.
     system libexec/"bin/python", "-c", "import certifi, cryptography, pydantic, rpds"
+
+    # celpy imports re2 at module scope and omnigent imports celpy behind a
+    # try/except, so a google-re2 missing from the venv disables inline policies
+    # silently instead of failing. Import both so the gap is caught at build time.
+    system libexec/"bin/python", "-c", "import re2, celpy"
   end
 end
