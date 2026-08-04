@@ -5,7 +5,8 @@
 # spliced into this file via three placeholders that live ONLY in the class body
 # below — keep them out of this comment or the splicer will mangle it:
 #   * the stable `url` / `sha256` lines  -> the released omnigent sdist on PyPI
-#   * the per-dependency `resource` stanzas (one per PyPI sdist in the closure)
+#   * the per-dependency `resource` stanzas (one per package in the closure: the
+#     PyPI sdist, or a pinned wheel for WHEEL_REQUIRED / PREFER_WHEEL)
 #
 # Edit the hand-tuned STRUCTURAL parts here (desc, depends_on, install, test).
 # Edit the dependency set in omnigent-ai/omnigent's `pyproject.toml`
@@ -27,7 +28,10 @@ class Omnigent < Formula
   sha256 "cf16ff6651b5b777e46a6e28607b26c996324c582bc1d2383e3819460bc7d758"
   license "Apache-2.0"
 
-  # The Rust toolchain builds jiter and watchfiles from source.
+  # Most compiled extensions come from upstream wheels (see PREFER_WHEEL in
+  # generate_formula.py). jiter, tiktoken and watchfiles still build here, because
+  # their maturin wheels have no Mach-O install-name padding and Homebrew cannot
+  # relocate them -- hence the Rust toolchain and the RUSTFLAGS below.
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
   # certifi, cryptography, pydantic (which bundles pydantic-core), and rpds-py
@@ -65,8 +69,8 @@ class Omnigent < Formula
     sha256 "879c3e79a2729ce768ebb7d36d4609e3a78a4ca2ec3a9f12286ca057e3d0db08"
   end
   resource "argon2-cffi-bindings" do
-    url "https://files.pythonhosted.org/packages/5c/2d/db8af0df73c1cf454f71b2bbe5e356b8c1f8041c979f505b3d3186e520a9/argon2_cffi_bindings-25.1.0.tar.gz"
-    sha256 "b957f3e6ea4d55d820e40ff76f450952807013d361a65d7f28acc0acbf29229d"
+    url "https://files.pythonhosted.org/packages/1d/57/96b8b9f93166147826da5f90376e784a10582dd39a393c99bb62cfcf52f0/argon2_cffi_bindings-25.1.0-cp39-abi3-macosx_10_9_universal2.whl"
+    sha256 "aecba1723ae35330a008418a91ea6cfcedf6d31e5fbaa056a166462ff066d500"
   end
   resource "asgiref" do
     url "https://files.pythonhosted.org/packages/e6/26/3b59f2bdae5f640389becb1f673cded775287f5fc4f816309d9ca9a3f93d/asgiref-3.12.1.tar.gz"
@@ -97,24 +101,30 @@ class Omnigent < Formula
     sha256 "9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6"
   end
   resource "cursor-sdk" do
-    url "https://files.pythonhosted.org/packages/db/7d/15d31f5f2e723c41a2602342ef83e80978847a85bdb5af2722a688b50bf3/cursor_sdk-1.0.26.tar.gz"
-    sha256 "cd4bdf0b44bc61b517c78efc11e2a2b3bbb701f06d6b4b1b55107df9572ada04"
+    url "https://files.pythonhosted.org/packages/bd/76/23bbf84bdb74ba81b30a75cde09efea0a03917ddea6b713c66da5b6fec37/cursor_sdk-1.0.25.tar.gz"
+    sha256 "a3bb4bc87b18a5cd408916f882c063e8ca60d23374b4a646c2aeb051a075769f"
   end
   resource "distro" do
     url "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz"
     sha256 "2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed"
   end
   resource "fastapi" do
-    url "https://files.pythonhosted.org/packages/8a/02/91e3416a8fdd715abb903a952a6bec7cdd8d14eed55d415fc8595524c319/fastapi-0.141.1.tar.gz"
-    sha256 "e8822fc40db1e1858054d7a949a888695bc9bdce70139178e33bd2871a453ca1"
+    url "https://files.pythonhosted.org/packages/2f/cb/7a4d2c2eb5a5d8a91763c05b7383d72917862e32f780daa0e27ffbb34cc6/fastapi-0.140.13.tar.gz"
+    sha256 "500172a08cf1459901f90b05c37d93060dada3b573fec8f0862445db52ba6b4b"
   end
   resource "ftfy" do
     url "https://files.pythonhosted.org/packages/a5/d3/8650919bc3c7c6e90ee3fa7fd618bf373cbbe55dff043bd67353dbb20cd8/ftfy-6.3.1.tar.gz"
     sha256 "9b3c3d90f84fb267fe64d375a07b7f8912d817cf86009ae134aa03e1819506ec"
   end
   resource "google-re2" do
-    url "https://files.pythonhosted.org/packages/6b/60/805c654ba53d685513df955ee745f71920fe8e6a284faf0f9b9dc19b659c/google_re2-1.1.20251105.tar.gz"
-    sha256 "1db14a292ee8303b91e91e7c37e05ac17d3c467f29416c79ac70a78be3e65bda"
+    on_arm do
+      url "https://files.pythonhosted.org/packages/5e/7f/7eb238bdcd06182b5f427afd305cf413b7cf4ea71047308bbf35912cf923/google_re2-1.1.20251105-1-cp314-cp314-macosx_13_0_arm64.whl"
+      sha256 "cc151cf6a585d9ebe711da32b23683fcff40f78db8c8587c7f4b209ef4658809"
+    end
+    on_intel do
+      url "https://files.pythonhosted.org/packages/6d/62/eed28eab67f939f4b9383c47b1db11638ade6ac30785c15cb960de85ba43/google_re2-1.1.20251105-1-cp314-cp314-macosx_13_0_x86_64.whl"
+      sha256 "7e2186d2c90488c1e11895343941f35ca2f58e9ba6c6b034fd531abe22ef77cc"
+    end
   end
   resource "googleapis-common-protos" do
     url "https://files.pythonhosted.org/packages/b5/c8/f439cffde755cffa462bfbb156278fa6f9d09119719af9814b858fd4f81f/googleapis_common_protos-1.75.0.tar.gz"
@@ -129,8 +139,8 @@ class Omnigent < Formula
     sha256 "762a186d2c6fd6794d4ea20d428d597ffb857cb56b66421651cbba15bdd5e813"
   end
   resource "grpcio" do
-    url "https://files.pythonhosted.org/packages/0c/98/304898ac4e04e2d5e4e4c2eadc178b1f2a16d5f4bc2f91306c87d64680b9/grpcio-1.83.0.tar.gz"
-    sha256 "7674587248fbbb2ac6e4eecf83a8a0f3d91a928f941de571acfd3a2f007fbc24"
+    url "https://files.pythonhosted.org/packages/d0/ab/d3874931d123a95e83a3ebf8aa04537988fb62425cedb8bf3cefc5ad41b2/grpcio-1.83.0-cp314-cp314-macosx_11_0_universal2.whl"
+    sha256 "d05ff664100d429335b93c91b8b34ddf9e94a112205e7fa06dede309e44a4e4c"
   end
   resource "h11" do
     url "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz"
@@ -141,8 +151,8 @@ class Omnigent < Formula
     sha256 "6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8"
   end
   resource "httptools" do
-    url "https://files.pythonhosted.org/packages/43/e5/d471fcb0e14523fe1c3f4ba58ca52480e7bd70ad7109a3846bc75892f7fb/httptools-0.8.0.tar.gz"
-    sha256 "6b2a32f18d97e16e90827d7a819ffa8dbd8cc245fc4e1fa9d1095b54ef4bd999"
+    url "https://files.pythonhosted.org/packages/1a/12/fa3fbf5f9517b273edea2dc982aa82a8c634091e67c590792b729017bc6f/httptools-0.8.0-cp314-cp314-macosx_10_13_universal2.whl"
+    sha256 "de242a49b5d18e0a8776e654e9f6bf6d89f3875a5c35b425a0e7ce940feb3fd6"
   end
   resource "httpx" do
     url "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz"
@@ -205,8 +215,14 @@ class Omnigent < Formula
     sha256 "04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49"
   end
   resource "markupsafe" do
-    url "https://files.pythonhosted.org/packages/7e/99/7690b6d4034fffd95959cbe0c02de8deb3098cc577c67bb6a24fe5d7caa7/markupsafe-3.0.3.tar.gz"
-    sha256 "722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698"
+    on_arm do
+      url "https://files.pythonhosted.org/packages/b5/64/7660f8a4a8e53c924d0fa05dc3a55c9cee10bbd82b11c5afb27d44b096ce/markupsafe-3.0.3-cp314-cp314-macosx_11_0_arm64.whl"
+      sha256 "c47a551199eb8eb2121d4f0f15ae0f923d31350ab9280078d1e5f12b249e0026"
+    end
+    on_intel do
+      url "https://files.pythonhosted.org/packages/33/8a/8e42d4838cd89b7dde187011e97fe6c3af66d8c044997d2183fbd6d31352/markupsafe-3.0.3-cp314-cp314-macosx_10_13_x86_64.whl"
+      sha256 "eaa9599de571d72e2daf60164784109f19978b327a3910d3e9de8c97b5b70cfe"
+    end
   end
   resource "mcp" do
     url "https://files.pythonhosted.org/packages/30/d3/f9acc21dfc886e4f78e2add1a47db46ce16884346afde53f8a064c02c891/mcp-1.29.0.tar.gz"
@@ -293,8 +309,8 @@ class Omnigent < Formula
     sha256 "d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"
   end
   resource "pendulum" do
-    url "https://files.pythonhosted.org/packages/cb/72/9a51afa0a822b09e286c4cb827ed7b00bc818dac7bd11a5f161e493a217d/pendulum-3.2.0.tar.gz"
-    sha256 "e80feda2d10fa3ff8b1526715f7d33dcb7e08494b3088f2c8a3ac92d4a4331ce"
+    url "https://files.pythonhosted.org/packages/02/fb/d65db067a67df7252f18b0cb7420dda84078b9e8bfb375215469c14a50be/pendulum-3.2.0-py3-none-any.whl"
+    sha256 "f3a9c18a89b4d9ef39c5fa6a78722aaff8d5be2597c129a3b16b9f40a561acf3"
   end
   resource "pexpect" do
     url "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz"
@@ -305,8 +321,8 @@ class Omnigent < Formula
     sha256 "9ec8a0ad96d5c56148b3f914aa79c1564c3fde5d2e6b876e7bc327e353cf8fa6"
   end
   resource "protobuf" do
-    url "https://files.pythonhosted.org/packages/66/70/e908e9c5e52ef7c3a6c7902c9dfbb34c7e29c25d2f81ade3856445fd5c94/protobuf-6.33.6.tar.gz"
-    sha256 "a6768d25248312c297558af96a9f9c929e8c4cee0659cb07e780731095f38135"
+    url "https://files.pythonhosted.org/packages/5c/01/a3c3ed5cd186f39e7880f8303cc51385a198a81469d53d0fdecf1f64d929/protobuf-6.33.6-cp39-abi3-macosx_10_9_universal2.whl"
+    sha256 "9720e6961b251bde64edfdab7d500725a2af5280f3f4c87e57c0208376aa8c3a"
   end
   resource "psutil" do
     url "https://files.pythonhosted.org/packages/aa/c6/d1ddf4abb55e93cebc4f2ed8b5d6dbad109ecb8d63748dd2b20ab5e57ebe/psutil-7.2.2.tar.gz"
@@ -345,16 +361,22 @@ class Omnigent < Formula
     sha256 "be54b7f3fa167bb83e4fcd936b887b708f4e57fe75911c02aebf53efaf8d938e"
   end
   resource "pyyaml" do
-    url "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz"
-    sha256 "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"
+    on_arm do
+      url "https://files.pythonhosted.org/packages/bd/9c/4d95bb87eb2063d20db7b60faa3840c1b18025517ae857371c4dd55a6b3a/pyyaml-6.0.3-cp314-cp314-macosx_11_0_arm64.whl"
+      sha256 "34d5fcd24b8445fadc33f9cf348c1047101756fd760b4dacb5c3e99755703310"
+    end
+    on_intel do
+      url "https://files.pythonhosted.org/packages/9d/8c/f4bd7f6465179953d3ac9bc44ac1a8a3e6122cf8ada906b4f96c60172d43/pyyaml-6.0.3-cp314-cp314-macosx_10_13_x86_64.whl"
+      sha256 "8d1fab6bb153a416f9aeb4b8763bc0f22a5586065f86f7664fc23339fc1c1fac"
+    end
   end
   resource "referencing" do
     url "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz"
     sha256 "44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8"
   end
   resource "regex" do
-    url "https://files.pythonhosted.org/packages/20/98/04b13f1ddfb63158025291c02e03eb42fbb7acb51d091d541050eb4e35e8/regex-2026.7.19.tar.gz"
-    sha256 "7e77b324909c1617cbb4c668677e2c6ae13f44d7c1de0d4f15f2e3c10f3315b5"
+    url "https://files.pythonhosted.org/packages/d2/25/0c4c452f8ef3efe456745b2f33195f5904b573fb4c2ff3f0cb9ec188461e/regex-2026.7.19-cp314-cp314-macosx_10_13_universal2.whl"
+    sha256 "a81758ed242b861b72e778ba34d41366441a2e10b16b472784c88da2dea7e2dd"
   end
   resource "requests" do
     url "https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-2.34.2.tar.gz"
@@ -417,12 +439,12 @@ class Omnigent < Formula
     sha256 "231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c"
   end
   resource "uvicorn" do
-    url "https://files.pythonhosted.org/packages/03/18/ccce41535dee1be77735592bd19965f3972c82e07ee703d324709496b716/uvicorn-0.52.1.tar.gz"
-    sha256 "112ec661814189acbccd3f7b86460147cc065fc92c0821afa78918780e4354dd"
+    url "https://files.pythonhosted.org/packages/a2/65/b7c6c443ccc58678c91e1e973bbe2a878591538655d6e1d47f24ba1c51f3/uvicorn-0.51.0.tar.gz"
+    sha256 "f6f4b69b657c312f516dd2d268ab9ae6f254b11e4bac504f37b2ab58b24dd0b0"
   end
   resource "uvloop" do
-    url "https://files.pythonhosted.org/packages/06/f0/18d39dbd1971d6d62c4629cc7fa67f74821b0dc1f5a77af43719de7936a7/uvloop-0.22.1.tar.gz"
-    sha256 "6c84bae345b9147082b17371e3dd5d42775bddce91f885499017f4607fdaf39f"
+    url "https://files.pythonhosted.org/packages/90/cd/b62bdeaa429758aee8de8b00ac0dd26593a9de93d302bff3d21439e9791d/uvloop-0.22.1-cp314-cp314-macosx_10_13_universal2.whl"
+    sha256 "3879b88423ec7e97cd4eba2a443aa26ed4e59b45e6b76aabf13fe2f27023a142"
   end
   resource "watchfiles" do
     url "https://files.pythonhosted.org/packages/cd/41/5e1a4bb12aac5f1493fa1bdc11154eca3b258ca4eba65d39c473fe19d8e9/watchfiles-1.2.0.tar.gz"
@@ -441,25 +463,38 @@ class Omnigent < Formula
     sha256 "681a2d0eefd721998f90642762b8e75c2159ec531b20ad5e437245ea7b06a107"
   end
   resource "zstandard" do
-    url "https://files.pythonhosted.org/packages/fd/aa/3e0508d5a5dd96529cdc5a97011299056e14c6505b678fd58938792794b1/zstandard-0.25.0.tar.gz"
-    sha256 "7713e1179d162cf5c7906da876ec2ccb9c3a9dcbdffef0cc7f70c3667a205f0b"
+    on_arm do
+      url "https://files.pythonhosted.org/packages/8d/09/d0a2a14fc3439c5f874042dca72a79c70a532090b7ba0003be73fee37ae2/zstandard-0.25.0-cp314-cp314-macosx_11_0_arm64.whl"
+      sha256 "05df5136bc5a011f33cd25bc9f506e7426c0c9b3f9954f056831ce68f3b6689f"
+    end
+    on_intel do
+      url "https://files.pythonhosted.org/packages/3d/5c/f8923b595b55fe49e30612987ad8bf053aef555c14f05bb659dd5dbe3e8a/zstandard-0.25.0-cp314-cp314-macosx_10_13_x86_64.whl"
+      sha256 "e29f0cf06974c899b2c188ef7f783607dbef36da4c242eb6c82dcd8b512855e3"
+    end
   end
 
   def install
     venv = virtualenv_create(libexec, "python3.14")
 
-    # The Rust extensions (jiter, watchfiles) must leave Mach-O header padding so
-    # Homebrew can rewrite their install names to the Cellar path during
-    # relocation (macOS only; the flag breaks Linux ld).
+    # jiter, tiktoken and watchfiles are the only Rust builds left. Their
+    # extensions must leave Mach-O header padding so Homebrew can rewrite install
+    # names to the Cellar path during relocation (macOS only; the flag breaks
+    # Linux ld). Everything else compiled is a prebuilt wheel.
     ENV.append_to_rustflags "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
 
-    # argon2-cffi-bindings' sdist ships an unprocessed .git_archival.txt that the
-    # (build-isolated, latest) setuptools-scm parses instead of falling back to
-    # PKG-INFO, so version detection fails. Pin the version it should report.
-    ENV["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_ARGON2_CFFI_BINDINGS"] =
-      resource("argon2-cffi-bindings").version.to_s
-
-    venv.pip_install resources
+    # Pure-Python resources Homebrew builds in place; every compiled
+    # extension is pinned to an upstream wheel instead (WHEEL_REQUIRED /
+    # PREFER_WHEEL in generate_formula.py), which is what keeps this formula from
+    # spending most of an hour in cc/rustc on a 3-core bottle builder. Homebrew
+    # only auto-installs `py3-none-any` wheels, so copy each platform wheel's
+    # cached download back to its real filename and pip-install the file directly.
+    wheels, sdists = resources.partition { |r| r.url.end_with?(".whl") }
+    venv.pip_install sdists
+    wheels.each do |r|
+      whl = buildpath/r.url.split("/").last
+      cp r.cached_download, whl
+      venv.pip_install whl
+    end
 
     venv.pip_install_and_link buildpath
 
@@ -478,5 +513,10 @@ class Omnigent < Formula
     # provided by Homebrew formulae and imported from the brewed python through
     # the virtualenv's system site-packages; confirm they resolve in the venv.
     system libexec/"bin/python", "-c", "import certifi, cryptography, pydantic, rpds"
+
+    # celpy imports re2 at module scope and omnigent imports celpy behind a
+    # try/except, so a google-re2 that failed to build disables inline policies
+    # silently instead of failing. Import both so the gap is caught at build time.
+    system libexec/"bin/python", "-c", "import re2, celpy"
   end
 end

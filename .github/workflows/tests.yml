@@ -39,6 +39,31 @@ jobs:
       - run: brew test-bot --only-formulae
         if: github.event_name == 'pull_request'
 
+      - name: Fail on ignored build failures
+        # test-bot sets ignore_failures for any formula that is neither newly
+        # added nor already bottled at its current version -- see
+        # lib/tests/formulae.rb, `ignore_failures = !test_default_formula? &&
+        # !bottled_on_current_version && !new_formula`.
+        # That is every version-bump PR in this tap,
+        # because the bottle block is only added later by `brew pr-pull`. So
+        # `brew install --build-bottle` can fail while the step still exits 0
+        # (`failed_steps.empty?` ignores them) and only prints
+        # "Warning: N failed step ignored!". omnigent 0.7.0, 0.8.0 and 0.8.1 all
+        # merged that way with three green checks and no bottle. test-bot records
+        # the same summary in steps_output.txt, so gate the job on it.
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          if [ ! -f steps_output.txt ]; then
+            echo "::error::steps_output.txt missing - brew test-bot did not run to completion."
+            exit 1
+          fi
+          cat steps_output.txt
+          if grep -qE "failed steps? ignored!" steps_output.txt; then
+            echo "::error::brew test-bot ignored a failed step: the formula did not build. See the build log above."
+            exit 1
+          fi
+
       - name: Upload bottles as artifact
         if: always() && github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
