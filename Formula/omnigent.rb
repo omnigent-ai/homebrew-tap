@@ -484,8 +484,8 @@ class Omnigent < Formula
     # argon2-cffi-bindings, markupsafe, pyyaml, zstandard, plus google-re2 (whose
     # sdist runs `bazel build` when GITHUB_ACTIONS is set) and pendulum's
     # pure-Python wheel (its sdist does not link on 3.14). Homebrew only
-    # auto-installs `py3-none-any` wheels, so copy
-    # pip-install the file directly.
+    # auto-installs `py3-none-any` wheels, so copy each platform wheel's cached
+    # download back to its real filename and pip-install the file directly.
     wheels, sdists = resources.partition { |r| r.url.end_with?(".whl") }
     venv.pip_install sdists
     wheels.each do |r|
