@@ -27,9 +27,11 @@ class Omnigent < Formula
   sha256 "cf16ff6651b5b777e46a6e28607b26c996324c582bc1d2383e3819460bc7d758"
   license "Apache-2.0"
 
-  # No Rust toolchain: every compiled extension (jiter, watchfiles, pendulum,
-  # grpcio, ...) is pinned to an upstream wheel, so nothing here invokes cargo.
+  # Most compiled extensions come from upstream wheels. jiter, tiktoken and
+  # watchfiles still build here: their maturin wheels have no Mach-O install-name
+  # padding, so Homebrew cannot relocate them ("Failed changing dylib ID").
   depends_on "pkgconf" => :build
+  depends_on "rust" => :build
   # certifi, cryptography, pydantic (which bundles pydantic-core), and rpds-py
   # are provided by Homebrew formulae rather than built as virtualenv resources.
   # The compiled ones would otherwise need a Rust/C build, and their transitive
@@ -175,14 +177,8 @@ class Omnigent < Formula
     sha256 "880c577ec9720b3a052d5bc611fb9f2269b3d87902ef42440df443b88e443280"
   end
   resource "jiter" do
-    on_arm do
-      url "https://files.pythonhosted.org/packages/65/7a/c415453e5213001bf3b411ff65dec3d303b0e76a4a2cfea9768cd4960994/jiter-0.16.0-cp314-cp314-macosx_11_0_arm64.whl"
-      sha256 "63efadc657488f45db1c676d81e704cac2abf3fdb892def1faea61db053127e2"
-    end
-    on_intel do
-      url "https://files.pythonhosted.org/packages/a7/89/bc4f1b57d5da938fd344a466396541e586d161320d70bffd929aaafcd8f4/jiter-0.16.0-cp314-cp314-macosx_10_12_x86_64.whl"
-      sha256 "b2c61484666ad42726029af0c00ef4541f0f3b5cdc550221f56c2343208018ee"
-    end
+    url "https://files.pythonhosted.org/packages/1d/1f/10936e16d8860c70698a1aa939a46aa0224813b782bce4e000e637da0b2d/jiter-0.16.0.tar.gz"
+    sha256 "7b24c3492c5f4f84a37946ad9cf504910cf6a782d6a4e0689b6673c5894b4a1c"
   end
   resource "jmespath" do
     url "https://files.pythonhosted.org/packages/d3/59/322338183ecda247fb5d1763a6cbe46eff7222eaeebafd9fa65d4bf5cb11/jmespath-1.1.0.tar.gz"
@@ -311,14 +307,8 @@ class Omnigent < Formula
     sha256 "d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"
   end
   resource "pendulum" do
-    on_arm do
-      url "https://files.pythonhosted.org/packages/cd/3a/64a35260f6ac36c0ad50eeb5f1a465b98b0d7603f79a5c2077c41326d639/pendulum-3.2.0-cp314-cp314-macosx_11_0_arm64.whl"
-      sha256 "e1fbb540edecb21f8244aebfb05a1f2333ddc6c7819378c099d4a61cc91ae93c"
-    end
-    on_intel do
-      url "https://files.pythonhosted.org/packages/82/99/5b9cc823862450910bcb2c7cdc6884c0939b268639146d30e4a4f55eb1f1/pendulum-3.2.0-cp314-cp314-macosx_10_12_x86_64.whl"
-      sha256 "c17ac069e88c5a1e930a5ae0ef17357a14b9cc5a28abadda74eaa8106d241c8e"
-    end
+    url "https://files.pythonhosted.org/packages/02/fb/d65db067a67df7252f18b0cb7420dda84078b9e8bfb375215469c14a50be/pendulum-3.2.0-py3-none-any.whl"
+    sha256 "f3a9c18a89b4d9ef39c5fa6a78722aaff8d5be2597c129a3b16b9f40a561acf3"
   end
   resource "pexpect" do
     url "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz"
@@ -415,14 +405,8 @@ class Omnigent < Formula
     sha256 "05d0213193f2fbaae60e2ecb593b4add4262ad4e46536b54abe36f11a71724e0"
   end
   resource "tiktoken" do
-    on_arm do
-      url "https://files.pythonhosted.org/packages/d9/77/5ec6e6bc5b30bed6d93f7f2162d8f6b32437b3ba27cb527cfe004f6109c9/tiktoken-0.13.0-cp314-cp314-macosx_11_0_arm64.whl"
-      sha256 "ca8b310bd93b3772cb1b7922d915446864860f562bdfe4825c63a0aed3fb28cd"
-    end
-    on_intel do
-      url "https://files.pythonhosted.org/packages/8c/93/0dd6adca026a616c3a92974566b43381eea4b475ce1f36c062b8271a9ac5/tiktoken-0.13.0-cp314-cp314-macosx_10_13_x86_64.whl"
-      sha256 "eaaaef47c2406277181d2086484c317bf7fc433e2d5d03ff94f56b0dcec87471"
-    end
+    url "https://files.pythonhosted.org/packages/e4/e5/5f3cb2159769d0f4324c0e9e87f9de3c4b1cd45848a96b2eb3566ad5ca77/tiktoken-0.13.0.tar.gz"
+    sha256 "c9435714c3a84c2319499de9a300c0e604449dd0799ff246458b3bb6a7f433c1"
   end
   resource "tomlkit" do
     url "https://files.pythonhosted.org/packages/94/96/e07752635b98536177fa1f37671c8f3cdde2e724c6bcf6034b2cfb571565/tomlkit-0.15.1.tar.gz"
@@ -461,14 +445,8 @@ class Omnigent < Formula
     sha256 "3879b88423ec7e97cd4eba2a443aa26ed4e59b45e6b76aabf13fe2f27023a142"
   end
   resource "watchfiles" do
-    on_arm do
-      url "https://files.pythonhosted.org/packages/aa/5d/c9ab3534374a4a67450696905d6ef16a04405448b8dc52bd752ae50423d4/watchfiles-1.2.0-cp314-cp314-macosx_11_0_arm64.whl"
-      sha256 "9f04b092229ad2c50126dd3c922c8822e51e605993764a33058d4a791ab42281"
-    end
-    on_intel do
-      url "https://files.pythonhosted.org/packages/e7/54/a9c7ea9a82a4ac65e7004c0a03920b5cdd2f9c3b678757d9cd425aa51d53/watchfiles-1.2.0-cp314-cp314-macosx_10_12_x86_64.whl"
-      sha256 "b8c8358484d5fa12ef34f05b7f4168eaf1932f408725ff6d023c33ec17bd79d4"
-    end
+    url "https://files.pythonhosted.org/packages/cd/41/5e1a4bb12aac5f1493fa1bdc11154eca3b258ca4eba65d39c473fe19d8e9/watchfiles-1.2.0.tar.gz"
+    sha256 "c995fba777f1ea992f090f9236e9284cf7a5d1a0130dd5a3d82c598cacd76838"
   end
   resource "wcwidth" do
     url "https://files.pythonhosted.org/packages/34/74/c6428f875774288bec1396f5bfcbc2d925700a4dad61727fd5f2b12f249d/wcwidth-0.8.2.tar.gz"
@@ -496,12 +474,17 @@ class Omnigent < Formula
   def install
     venv = virtualenv_create(libexec, "python3.14")
 
-    # Most resources are sdists Homebrew builds in place. google-re2 (required by
-    # cel-python, which backs CEL policy evaluation) is pinned to its upstream
-    # wheel instead: its sdist runs `bazel build` whenever GITHUB_ACTIONS is set,
-    # and the non-bazel path needs re2/abseil/pybind11 headers and C++17 that it
-    # never requests. Homebrew only auto-installs `py3-none-any` wheels, so copy
-    # each platform wheel's cached download back to its real filename and
+    # jiter, tiktoken and watchfiles are the only Rust builds left. Their
+    # extensions must leave Mach-O header padding so Homebrew can rewrite install
+    # names to the Cellar path during relocation (macOS only; breaks Linux ld).
+    ENV.append_to_rustflags "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
+
+    # Every other compiled extension is pinned to an upstream wheel, which is what
+    # keeps this build out of cc/rustc: grpcio, protobuf, regex, uvloop, httptools,
+    # argon2-cffi-bindings, markupsafe, pyyaml, zstandard, plus google-re2 (whose
+    # sdist runs `bazel build` when GITHUB_ACTIONS is set) and pendulum's
+    # pure-Python wheel (its sdist does not link on 3.14). Homebrew only
+    # auto-installs `py3-none-any` wheels, so copy
     # pip-install the file directly.
     wheels, sdists = resources.partition { |r| r.url.end_with?(".whl") }
     venv.pip_install sdists
