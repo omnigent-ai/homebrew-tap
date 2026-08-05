@@ -1,0 +1,150 @@
+name: formula bump review request
+
+# When omnigent's release automation opens a formula bump here, ask a maintainer
+# to look at it once the build has finished -- and tell them whether it actually
+# built, because in this tap a green check does not mean it did.
+#
+# The failure mode this fixes is nobody noticing the PR: the tap froze at 0.2.0
+# while PyPI moved to 0.5.1, and 0.8.1 sat unbottled after its formula was fixed.
+# Publishing stays manual: a human reviews the resource diff and applies the
+# `pr-pull` label, exactly as today.
+#
+# Deliberately holds no `contents` write. It only requests a review and posts a
+# comment, so the worst a hostile PR can extract from it is a review request on
+# itself. (An earlier draft of this workflow auto-published bottles, which in a
+# `workflow_run` job on a public repo was a supply-chain hole -- `head_branch` on
+# a fork PR is the contributor's own branch name, so a branch prefix cannot
+# authenticate anything.)
+
+on:
+  workflow_run:
+    workflows: ["brew test-bot"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: formula-bump-review-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  request-review:
+    # Machine-generated bumps from this repo only. Human and fork PRs are left
+    # alone -- they already get looked at, and a "safe to publish" verdict on
+    # unreviewed fork code would be actively misleading.
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'auto/formula/')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      RUN_URL: ${{ github.event.workflow_run.html_url }}
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+      TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+      CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+      REVIEWER: fanzeyi
+      EXPECTED_AUTHOR: omnigent-ci
+    steps:
+      - name: Resolve the pull request
+        id: pr
+        run: |
+          set -euo pipefail
+          pr="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open \
+                  --json number,author,headRefOid --jq '.[0] // empty')"
+          if [ -z "$pr" ]; then
+            echo "No open PR for ${BRANCH}; nothing to review." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          num="$(printf '%s' "$pr" | jq -r .number)"
+          author="$(printf '%s' "$pr" | jq -r '.author.login')"
+          # `gh` reports App actors as `app/<slug>`; tolerate either form so a gh
+          # upgrade cannot turn this into a permanent silent skip.
+          if [ "${author#app/}" != "$EXPECTED_AUTHOR" ]; then
+            echo "PR #${num} is authored by ${author}, not ${EXPECTED_AUTHOR}; leaving it alone." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "number=${num}" >> "$GITHUB_OUTPUT"
+          echo "head=$(printf '%s' "$pr" | jq -r .headRefOid)" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Judge whether the formula really built
+        id: verdict
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          PR_HEAD: ${{ steps.pr.outputs.head }}
+        run: |
+          set -euo pipefail
+          problems=""
+
+          # 1. Bottles are the only trustworthy proof of a successful build:
+          #    upload-artifact uses if-no-files-found: warn, so a build that
+          #    produced none uploads nothing at all.
+          bottles="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" \
+                       --jq '[.artifacts[] | select(.name | startswith("bottles_")) | select(.size_in_bytes > 1024) | .name] | sort | join(", ")')"
+          [ -n "$bottles" ] || problems="${problems}- no bottle artifacts: the formula did not build\n"
+
+          # 2. brew test-bot sets ignore_failures for any formula that is neither
+          #    newly added nor already bottled at its current version
+          #    (lib/tests/formulae.rb) -- every version bump here, since the bottle
+          #    block is only added afterwards. A failed `brew install
+          #    --build-bottle` then still exits 0 and merely prints
+          #    "Warning: N failed step ignored!". 0.7.0, 0.8.0 and 0.8.1 all
+          #    reported green that way with no bottle.
+          for id in $(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --paginate --jq '.jobs[].id'); do
+            name="$(gh api "repos/${GITHUB_REPOSITORY}/actions/jobs/${id}" --jq .name)"
+            log="$(gh api "repos/${GITHUB_REPOSITORY}/actions/jobs/${id}/logs" 2>/dev/null || true)"
+            if printf '%s' "$log" | grep -qE "failed steps? ignored!"; then
+              problems="${problems}- ${name}: test-bot ignored a failed step, so its green tick is meaningless\n"
+            fi
+          done
+
+          # 3. The run must correspond to the current head, since a later push
+          #    would not be covered by this verdict.
+          if [ "$PR_HEAD" != "$TESTED_SHA" ]; then
+            problems="${problems}- head moved to ${PR_HEAD} after the run tested ${TESTED_SHA}\n"
+          fi
+
+          [ "$CONCLUSION" = "success" ] || problems="${problems}- test-bot concluded '${CONCLUSION}'\n"
+
+          {
+            echo "bottles=${bottles:-none}"
+            if [ -z "$problems" ]; then
+              echo "ok=true"
+            else
+              echo "ok=false"
+            fi
+          } >> "$GITHUB_OUTPUT"
+          printf 'problems<<PROBLEMS_EOF\n%b\nPROBLEMS_EOF\n' "$problems" >> "$GITHUB_OUTPUT"
+
+      - name: Request review and report the verdict
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          PR: ${{ steps.pr.outputs.number }}
+          OK: ${{ steps.verdict.outputs.ok }}
+          BOTTLES: ${{ steps.verdict.outputs.bottles }}
+          PROBLEMS: ${{ steps.verdict.outputs.problems }}
+        run: |
+          set -euo pipefail
+          # --add-reviewer is idempotent, and a re-run after a new push should not
+          # fail the job just because the review was already requested.
+          gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --add-reviewer "$REVIEWER" \
+            || echo "::warning::could not add ${REVIEWER} as a reviewer (already requested, or not a collaborator)"
+
+          if [ "$OK" = "true" ]; then
+            body="$(printf '@%s this formula bump is ready for review.\n\n**Built:** bottles produced for `%s`, and no job had a failure swallowed by test-bot ([run](%s)).\n\nReview the resource diff, then apply the **`pr-pull`** label to publish the bottles and land it.\n' \
+              "$REVIEWER" "$BOTTLES" "$RUN_URL")"
+          else
+            body="$(printf '@%s this formula bump is **not** safe to publish yet ([run](%s)):\n\n%s\nDo **not** apply `pr-pull` until this is resolved. Note that the check may still show green: `brew test-bot` ignores build failures for any formula that is neither newly added nor already bottled at its current version, which is every version bump in this tap.\n' \
+              "$REVIEWER" "$RUN_URL" "$PROBLEMS")"
+          fi
+          printf '%s' "$body" | gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file -
+          printf '%s' "$body" >> "$GITHUB_STEP_SUMMARY"
