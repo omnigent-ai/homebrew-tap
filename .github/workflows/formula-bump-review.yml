@@ -123,7 +123,11 @@ jobs:
               echo "ok=false"
             fi
           } >> "$GITHUB_OUTPUT"
-          printf 'problems<<PROBLEMS_EOF\n%b\nPROBLEMS_EOF\n' "$problems" >> "$GITHUB_OUTPUT"
+          # `problems` embeds job and artifact names, so use an unguessable
+          # heredoc delimiter: a fixed one could be closed early by a crafted name
+          # to inject further step outputs (e.g. ok=true).
+          delim="PROBLEMS_$(openssl rand -hex 16)"
+          printf 'problems<<%s\n%b\n%s\n' "$delim" "$problems" "$delim" >> "$GITHUB_OUTPUT"
 
       - name: Request review and report the verdict
         if: steps.pr.outputs.skip != 'true'
