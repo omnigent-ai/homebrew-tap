@@ -24,16 +24,9 @@ class Omnigent < Formula
 
   desc "Meta-harness for AI agents"
   homepage "https://github.com/omnigent-ai/omnigent"
-  url "https://files.pythonhosted.org/packages/7a/ca/470b223c6a7b80587a01425c9a9d7c334f17cb5e2421bd3e675b81b9edab/omnigent-0.8.1.tar.gz"
-  sha256 "cf16ff6651b5b777e46a6e28607b26c996324c582bc1d2383e3819460bc7d758"
+  url "https://files.pythonhosted.org/packages/a7/bf/0c0459ebd33e32eb0204656fb04fbd7a3297b9ba02aaec4bdcf7e33eacc9/omnigent-0.8.2.tar.gz"
+  sha256 "88dda12d1d27e511cfe0527bb83fa9977305592829dab92cb1009071cf897db0"
   license "Apache-2.0"
-
-  bottle do
-    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.8.1"
-    rebuild 1
-    sha256 cellar: :any, arm64_tahoe:   "cd60e4b7e0763c7aeb437f08122707902e597c671c738c71a2bc45a763d155b9"
-    sha256 cellar: :any, arm64_sequoia: "4fbfacfb64ee90d2563febf1cfa1e1bb6dfbb29cca6e0d1269777ed66bb808cf"
-  end
 
   # Most compiled extensions come from upstream wheels (see PREFER_WHEEL in
   # generate_formula.py). jiter, tiktoken and watchfiles still build here, because
@@ -56,8 +49,8 @@ class Omnigent < Formula
   depends_on "tmux"
 
   resource "alembic" do
-    url "https://files.pythonhosted.org/packages/fb/01/a48dab7827ac4421272399f7ed9a2ec17edd12c8bcde4417bd7b6821b71a/alembic-1.19.0.tar.gz"
-    sha256 "6487c612fc719dcfa22b17d2dd5b2b458929641e6aa2f0b65b135727f5e6d501"
+    url "https://files.pythonhosted.org/packages/1a/cc/ac0bed8e562e7407fe55c3ba85a4dce86e6dbd8730887bd1e406a6c5c18a/alembic-1.18.5.tar.gz"
+    sha256 "1554982221dd17e9a749b53902407578eb305e453f71999e8c7f0a48389fff8e"
   end
   resource "annotated-doc" do
     url "https://files.pythonhosted.org/packages/5a/8e/38aa427ed5402449e226975b649c5dc73ccadfefeb95e6aecb8f8ea4b6b6/annotated_doc-0.0.5.tar.gz"
@@ -100,8 +93,8 @@ class Omnigent < Formula
     sha256 "673611bbd43f0810bec0b0f028ddeaaa501190339cac411f347ac76917c3ae7b"
   end
   resource "claude-agent-sdk" do
-    url "https://files.pythonhosted.org/packages/19/aa/25cda3ddcff22a5097571be871e00cd9c4dca1326e16910c401998fbc258/claude_agent_sdk-0.2.130.tar.gz"
-    sha256 "4db7b937bb4e411ac1c9cdd7a7089043836d0a4ad80f8244e8a8413c399beb1e"
+    url "https://files.pythonhosted.org/packages/a7/e8/3a9622b31f9ee22274e13a620e5e75ac38454d14538391b2fe3bc7eb76dc/claude_agent_sdk-0.2.128.tar.gz"
+    sha256 "2ac7b2b3bc56ae9037fd284c8690d3dafab9493ecd28d8974bba79a418e1b800"
   end
   resource "click" do
     url "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz"
@@ -214,8 +207,8 @@ class Omnigent < Formula
     sha256 "b426a7a6d6d53189d318f2b6236ab5d6429eaf09259f1ca33eb716eed10d2905"
   end
   resource "mako" do
-    url "https://files.pythonhosted.org/packages/73/b2/3c025fc185ce755ab39dd88b1971ba9f4bec0a897bda0acc29b6e7676153/mako-1.4.0.tar.gz"
-    sha256 "61aac9619e1325fa6e7be2f8dd463caef61247b3cd32a41a8692684548269ce3"
+    url "https://files.pythonhosted.org/packages/00/62/791b31e69ae182791ec67f04850f2f062716bbd205483d63a215f3e062d3/mako-1.3.12.tar.gz"
+    sha256 "9f778e93289bd410bb35daadeb4fc66d95a746f0b75777b942088b7fd7af550a"
   end
   resource "markdown-it-py" do
     url "https://files.pythonhosted.org/packages/06/ff/7841249c247aa650a76b9ee4bbaeae59370dc8bfd2f6c01f3630c35eb134/markdown_it_py-4.2.0.tar.gz"
@@ -244,12 +237,12 @@ class Omnigent < Formula
     sha256 "48e8f4d9e7e5878571ecf6f2b4e57634f93cd474cc8cfbd2376f2d11b396e30d"
   end
   resource "omnigent-client" do
-    url "https://files.pythonhosted.org/packages/e3/2e/75c67259a04aa1ac6765ba330b5748d75f94146741809034176827ae19c8/omnigent_client-0.8.1.tar.gz"
-    sha256 "76691529387a9e1cba07ca948811b38fb5df43c1a0a412dbbdb602d46acdd59d"
+    url "https://files.pythonhosted.org/packages/a3/eb/06e773883c2409cc8eb713c931464edcfeef9f850908de17dd7754ffb06e/omnigent_client-0.8.2.tar.gz"
+    sha256 "543d9a98cd1319234c60464666ab4080654c361b663716245bb1af4550f589c2"
   end
   resource "omnigent-ui-sdk" do
-    url "https://files.pythonhosted.org/packages/4e/8e/b489ec6b867f4c3c3373697fd1d90d6388e86c5cf5e496a5f2f2a30f62dd/omnigent_ui_sdk-0.8.1.tar.gz"
-    sha256 "0101806058c82a8e3740dd3660a087f45863a416c439a15b3a6c68c0911e3e89"
+    url "https://files.pythonhosted.org/packages/e1/ec/a13a31eb6a49932ef3f9cfd9209e6797b4cca1737d5325c527ebc3016089/omnigent_ui_sdk-0.8.2.tar.gz"
+    sha256 "e2692381cb69b5714bad7c655939eec9a8ab6d3b323c3583ad583e7ce321635a"
   end
   resource "openai" do
     url "https://files.pythonhosted.org/packages/49/f5/7c7cb955305cb41f7f3c5fd7e0e38bf6bbf2658468863d4b7b868a5cb8df/openai-2.44.0.tar.gz"
@@ -446,8 +439,8 @@ class Omnigent < Formula
     sha256 "231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c"
   end
   resource "uvicorn" do
-    url "https://files.pythonhosted.org/packages/03/18/ccce41535dee1be77735592bd19965f3972c82e07ee703d324709496b716/uvicorn-0.52.1.tar.gz"
-    sha256 "112ec661814189acbccd3f7b86460147cc065fc92c0821afa78918780e4354dd"
+    url "https://files.pythonhosted.org/packages/05/c8/2d307868453a4bca6e64fa3581d122ae0748a0869c53f159339def179c7c/uvicorn-0.52.0.tar.gz"
+    sha256 "ca8876ad6c1983f394157c168b39d52f6dd56dabf5602fa0982751cffc2293ae"
   end
   resource "uvloop" do
     url "https://files.pythonhosted.org/packages/90/cd/b62bdeaa429758aee8de8b00ac0dd26593a9de93d302bff3d21439e9791d/uvloop-0.22.1-cp314-cp314-macosx_10_13_universal2.whl"
