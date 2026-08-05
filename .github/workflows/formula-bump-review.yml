@@ -153,19 +153,19 @@ jobs:
           body="${RUNNER_TEMP}/comment.md"
           if [ "$OK" = "true" ]; then
             cat > "$body" <<EOF
-@${REVIEWER} this formula bump is ready for review.
+          @${REVIEWER} this formula bump is ready for review.
 
-**Built:** bottles produced for \`${BOTTLES}\`, and no job had a failure swallowed by test-bot ([run](${RUN_URL})).
+          **Built:** bottles produced for \`${BOTTLES}\`, and no job had a failure swallowed by test-bot ([run](${RUN_URL})).
 
-Review the resource diff, then apply the **\`pr-pull\`** label to publish the bottles and land it.
-EOF
+          Review the resource diff, then apply the **\`pr-pull\`** label to publish the bottles and land it.
+          EOF
           else
             cat > "$body" <<EOF
-@${REVIEWER} this formula bump is **not** safe to publish yet ([run](${RUN_URL})):
+          @${REVIEWER} this formula bump is **not** safe to publish yet ([run](${RUN_URL})):
 
-${PROBLEMS}
-Do **not** apply \`pr-pull\` until this is resolved. The check may still show green: \`brew test-bot\` ignores build failures for any formula that is neither newly added nor already bottled at its current version, which is every version bump in this tap.
-EOF
+          ${PROBLEMS}
+          Do **not** apply \`pr-pull\` until this is resolved. The check may still show green: \`brew test-bot\` ignores build failures for any formula that is neither newly added nor already bottled at its current version, which is every version bump in this tap.
+          EOF
           fi
           gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$body"
           cat "$body" >> "$GITHUB_STEP_SUMMARY"
