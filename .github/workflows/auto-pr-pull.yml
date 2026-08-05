@@ -1,0 +1,145 @@
+name: auto pr-pull
+
+# Publish bottles and land a machine-generated formula bump without waiting for a
+# human to apply the `pr-pull` label -- but only when the build actually produced
+# bottles.
+#
+# Why `workflow_run` instead of a step inside tests.yml: we need a *finished*
+# test-bot run (all matrix jobs done, artifacts uploaded) plus write access to
+# push to main. A `pull_request` job has neither.
+#
+# Why this runs `brew pr-pull` itself instead of just adding the `pr-pull` label:
+# a label applied with the default GITHUB_TOKEN does not start a new workflow run,
+# so publish.yml would never fire. This runs the same command publish.yml runs.
+# The label path stays for humans and still works.
+#
+# Scope is deliberately narrow -- only `auto/formula/*` branches whose diff is
+# nothing but `Formula/omnigent.rb`, i.e. what omnigent's homebrew-tap-pr.yml
+# generates. Every other PR keeps the manual label gate.
+
+on:
+  workflow_run:
+    workflows: ["brew test-bot"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auto-pr-pull-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  auto-pr-pull:
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'auto/formula/')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+    steps:
+      - name: Resolve the pull request
+        id: pr
+        run: |
+          set -euo pipefail
+          num="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open \
+                   --json number --jq '.[0].number // empty')"
+          if [ -z "$num" ]; then
+            echo "No open PR for ${BRANCH} — already landed or closed; nothing to do." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Only ever auto-publish a pure formula bump. Anything that also touches
+          # workflows, scripts or other formulae goes through human review.
+          files="$(gh pr view "$num" --repo "$GITHUB_REPOSITORY" --json files \
+                     --jq '[.files[].path] | sort | join(",")')"
+          if [ "$files" != "Formula/omnigent.rb" ]; then
+            echo "::warning::PR #${num} touches ${files}, not just Formula/omnigent.rb — leaving it for manual \`pr-pull\`."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "number=${num}" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Require that bottles were actually built
+        id: bottles
+        if: steps.pr.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          # `upload-artifact` has if-no-files-found: warn, so a build that produced
+          # no bottle uploads no artifact at all. Artifact presence is therefore the
+          # signal that the formula really built.
+          names="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" \
+                     --jq '[.artifacts[] | select(.name | startswith("bottles_")) | select(.size_in_bytes > 1024) | .name] | sort | join(" ")')"
+          if [ -z "$names" ]; then
+            echo "::error::test-bot run ${RUN_ID} produced no bottle artifacts — the formula did not build. Not publishing."
+            exit 1
+          fi
+          echo "Bottles present: ${names}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Reject a build whose failure test-bot swallowed
+        if: steps.pr.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          # `brew test-bot` sets ignore_failures for any formula that is neither
+          # newly added nor already bottled at its current version
+          # (lib/tests/formulae.rb) -- which is every version bump in this tap,
+          # since the bottle block is only added afterwards. A failed
+          # `brew install --build-bottle` then still exits 0 and only prints
+          # "Warning: N failed step ignored!". omnigent 0.7.0, 0.8.0 and 0.8.1 all
+          # reported green that way. Refuse to auto-publish such a run.
+          ids="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" --paginate --jq '.jobs[].id')"
+          bad=0
+          for id in $ids; do
+            name="$(gh api "repos/${GITHUB_REPOSITORY}/actions/jobs/${id}" --jq .name)"
+            log="$(gh api "repos/${GITHUB_REPOSITORY}/actions/jobs/${id}/logs" 2>/dev/null || true)"
+            if printf '%s' "$log" | grep -qE "failed steps? ignored!"; then
+              echo "::error::${name}: brew test-bot ignored a failed step — the formula did not build."
+              bad=1
+            fi
+          done
+          [ "$bad" -eq 0 ] || exit 1
+          echo "No ignored build failures." | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Homebrew
+        if: steps.pr.outputs.skip != 'true'
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up git
+        if: steps.pr.outputs.skip != 'true'
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Pull bottles
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST: ${{ steps.pr.outputs.number }}
+        run: brew pr-pull --debug --tap="$GITHUB_REPOSITORY" "$PULL_REQUEST"
+
+      - name: Push commits
+        if: steps.pr.outputs.skip != 'true'
+        uses: Homebrew/actions/git-try-push@main
+        with:
+          branch: main
+
+      - name: Delete branch
+        if: steps.pr.outputs.skip != 'true'
+        run: git push --delete origin "$BRANCH"
+
+      - name: Summary
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          PULL_REQUEST: ${{ steps.pr.outputs.number }}
+        run: |
+          echo "Auto-published bottles for #${PULL_REQUEST} (${BRANCH}) and pushed to main." \
+            >> "$GITHUB_STEP_SUMMARY"
