@@ -72,9 +72,12 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "number=${num}" >> "$GITHUB_OUTPUT"
-          echo "head=$(printf '%s' "$pr" | jq -r .headRefOid)" >> "$GITHUB_OUTPUT"
-          echo "skip=false" >> "$GITHUB_OUTPUT"
+          head="$(printf '%s' "$pr" | jq -r .headRefOid)"
+          {
+            echo "number=${num}"
+            echo "head=${head}"
+            echo "skip=false"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Judge whether the formula really built
         id: verdict
@@ -143,12 +146,26 @@ jobs:
           gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --add-reviewer "$REVIEWER" \
             || echo "::warning::could not add ${REVIEWER} as a reviewer (already requested, or not a collaborator)"
 
+          # Heredocs rather than printf: the body contains markdown code spans,
+          # and backticks inside a single-quoted printf format trip shellcheck
+          # (SC2016). Unquoted heredoc so ${...} interpolates, with \` for a
+          # literal backtick so it is not command substitution.
+          body="${RUNNER_TEMP}/comment.md"
           if [ "$OK" = "true" ]; then
-            body="$(printf '@%s this formula bump is ready for review.\n\n**Built:** bottles produced for `%s`, and no job had a failure swallowed by test-bot ([run](%s)).\n\nReview the resource diff, then apply the **`pr-pull`** label to publish the bottles and land it.\n' \
-              "$REVIEWER" "$BOTTLES" "$RUN_URL")"
+            cat > "$body" <<EOF
+@${REVIEWER} this formula bump is ready for review.
+
+**Built:** bottles produced for \`${BOTTLES}\`, and no job had a failure swallowed by test-bot ([run](${RUN_URL})).
+
+Review the resource diff, then apply the **\`pr-pull\`** label to publish the bottles and land it.
+EOF
           else
-            body="$(printf '@%s this formula bump is **not** safe to publish yet ([run](%s)):\n\n%s\nDo **not** apply `pr-pull` until this is resolved. Note that the check may still show green: `brew test-bot` ignores build failures for any formula that is neither newly added nor already bottled at its current version, which is every version bump in this tap.\n' \
-              "$REVIEWER" "$RUN_URL" "$PROBLEMS")"
+            cat > "$body" <<EOF
+@${REVIEWER} this formula bump is **not** safe to publish yet ([run](${RUN_URL})):
+
+${PROBLEMS}
+Do **not** apply \`pr-pull\` until this is resolved. The check may still show green: \`brew test-bot\` ignores build failures for any formula that is neither newly added nor already bottled at its current version, which is every version bump in this tap.
+EOF
           fi
-          printf '%s' "$body" | gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file -
-          printf '%s' "$body" >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$body"
+          cat "$body" >> "$GITHUB_STEP_SUMMARY"
