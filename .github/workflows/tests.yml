@@ -10,7 +10,12 @@ jobs:
   test-bot:
     strategy:
       matrix:
-        os: [ macos-15, macos-15-intel, macos-26 ]
+        # Apple Silicon only: homebrew-core no longer publishes `sequoia` bottles
+        # for rust, cryptography, libyaml, pydantic, rpds-py or tmux, so test-bot
+        # on macos-15-intel bailed with "omnigent has unbottled dependencies" and
+        # reported SKIPPED as a green check. The formula now declares
+        # `depends_on arch: :arm64`, so Intel is explicitly unsupported.
+        os: [ macos-15, macos-26 ]
     runs-on: ${{ matrix.os }}
     permissions:
       actions: read
