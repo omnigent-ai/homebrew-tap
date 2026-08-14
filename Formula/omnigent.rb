@@ -482,6 +482,24 @@ class Omnigent < Formula
     # Linux ld). Everything else compiled is a prebuilt wheel.
     ENV.append_to_rustflags "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
 
+    # Those same three sdists fetch their crates from index.crates.io, and Homebrew has no
+    # equivalent of HOMEBREW_PIP_INDEX_URL for cargo. `brew` re-execs through `env -i` with
+    # an allowlist, so a CARGO_* export cannot reach the build, and builds run with a
+    # scrubbed HOME, so ~/.cargo/config.toml is invisible too. Write the source replacement
+    # into the buildpath and point CARGO_HOME at it, or the Rust resources cannot build
+    # wherever index.crates.io is unreachable.
+    if (cargo_index = ENV.fetch("HOMEBREW_CARGO_INDEX_URL", nil).presence)
+      (buildpath/".cargo").mkpath
+      (buildpath/".cargo/config.toml").write <<~TOML
+        [source.crates-io]
+        replace-with = "mirror"
+
+        [source.mirror]
+        registry = "sparse+#{cargo_index}"
+      TOML
+      ENV["CARGO_HOME"] = buildpath/".cargo"
+    end
+
     # Pure-Python resources are sdists Homebrew builds in place. Every other
     # compiled extension is pinned to an upstream wheel (WHEEL_REQUIRED /
     # PREFER_WHEEL in generate_formula.py), which is what keeps this formula out of
