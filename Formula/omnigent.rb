@@ -414,6 +414,19 @@ class Omnigent < Formula
   end
 
   def install
+    # Homebrew honours HOMEBREW_PIP_INDEX_URL only when downloading the resource
+    # archives themselves. Building an sdist then shells out to a second, isolated
+    # pip that resolves the build backend (`setuptools`, ...) from *its own* index,
+    # which defaults to https://pypi.org/simple. `brew` re-execs through `env -i`
+    # with an allowlist and builds run with a scrubbed HOME, so neither a
+    # PIP_INDEX_URL export nor ~/.config/pip/pip.conf reaches that child. Forward
+    # the mirror explicitly, or every sdist resource fails to build its wheel
+    # wherever pypi.org itself is unreachable.
+    if Homebrew::EnvConfig.non_default_variable?(:HOMEBREW_PIP_INDEX_URL) &&
+       (pip_index_url = Homebrew::EnvConfig.pip_index_url.presence)
+      ENV["PIP_INDEX_URL"] = pip_index_url
+    end
+
     venv = virtualenv_create(libexec, "python3.14")
 
     # jiter, tiktoken and watchfiles are the only Rust builds left. Their
