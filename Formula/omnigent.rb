@@ -24,8 +24,8 @@ class Omnigent < Formula
 
   desc "Meta-harness for AI agents"
   homepage "https://github.com/omnigent-ai/omnigent"
-  url "https://files.pythonhosted.org/packages/a7/07/ea1bc7a981e3fd615660d75face4dae94ae677f751f3c89281b94a640678/omnigent-0.10.0.tar.gz"
-  sha256 "af159f62d34923972873223b73234f9300a312ad778062db56b831ebe7ac15da"
+  url "https://files.pythonhosted.org/packages/cd/71/7dcf42bd265f47fdecfecf7ddbe274424c0d8de71036026409d578548592/omnigent-0.11.0.tar.gz"
+  sha256 "597d7f74f8a31e867580e65f5b90ed97be3231011f8cecb3437cd70a8862c8ab"
   license "Apache-2.0"
 
   # Most compiled extensions come from upstream wheels (see PREFER_WHEEL in
@@ -85,20 +85,20 @@ class Omnigent < Formula
     sha256 "3eb0a619e8df0f338d0430cda01427a742e77e3c433a1c7c3ebd409cd804c45a"
   end
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/bd/2a/23f34ec9d04624958e137efdc394888716353190e75f25dd22c7a2c7a8aa/charset_normalizer-3.4.9.tar.gz"
-    sha256 "673611bbd43f0810bec0b0f028ddeaaa501190339cac411f347ac76917c3ae7b"
+    url "https://files.pythonhosted.org/packages/e5/3f/143b048436775b0f76ac3eec145c019e8173ccc2885c8f20319b996d5e83/charset_normalizer-3.5.1.tar.gz"
+    sha256 "6117b84ea48435e5356dc737f5121485c30920ba43375fa7b434fd753df0eac3"
   end
   resource "claude-agent-sdk" do
-    url "https://files.pythonhosted.org/packages/67/ef/ecd4cc717d0af9b29c0202b2b69284582f1463e7429dc4e9f00c3c5c5771/claude_agent_sdk-0.2.136.tar.gz"
-    sha256 "a45bff05f629dc753992d960a944737c61de9efab4d5a798b0c4e83d21386bc3"
+    url "https://files.pythonhosted.org/packages/11/b6/cfcdefed1f866a8ba372ef3884c8020dd54338d15d8b45d5a1ff7432cea1/claude_agent_sdk-0.2.139.tar.gz"
+    sha256 "4395ed541cdd4c13aeb1213b3b414b7e8a94cc060a773137e961882e81c174a7"
   end
   resource "click" do
     url "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz"
     sha256 "9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6"
   end
   resource "cursor-sdk" do
-    url "https://files.pythonhosted.org/packages/7d/e3/3dc4b4575948206cecb7f8bfdba972c14812a32a09a4c668f23db56f9b15/cursor_sdk-1.0.27.tar.gz"
-    sha256 "ad1647030dec45723ad571facc978cda78afa68600306ba1c073fcfadf5ea9a4"
+    url "https://files.pythonhosted.org/packages/2d/58/6b8ac6a13c6b2c621a02da646e773dff4225af48892b77294f1e3ca0e914/cursor_sdk-1.0.28.tar.gz"
+    sha256 "e7782527e0a62816abc0610df3abda893ff27b5ea7b8d470668e31d08892a604"
   end
   resource "distro" do
     url "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz"
@@ -127,8 +127,8 @@ class Omnigent < Formula
     sha256 "adb4bae02e91a8e863e48b177e4014bdcac8a6b5e047ea1df687a61534b85e6c"
   end
   resource "griffelib" do
-    url "https://files.pythonhosted.org/packages/33/e4/8d187ea29c2e30b3a09505c567513077d6117861bde1fbd997a167f262ec/griffelib-2.1.0.tar.gz"
-    sha256 "762a186d2c6fd6794d4ea20d428d597ffb857cb56b66421651cbba15bdd5e813"
+    url "https://files.pythonhosted.org/packages/f0/b4/a767e91c606deefc447a96eaf59edd77397960b1d677dffd833ee8449831/griffelib-2.2.0.tar.gz"
+    sha256 "e1bc36fe9cd21d4b6b659b456346755e4cfdc5676c0a5214083126ee12612b3c"
   end
   resource "h11" do
     url "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz"
@@ -151,8 +151,8 @@ class Omnigent < Formula
     sha256 "9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d"
   end
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/cd/63/9496c57188a2ee585e0f1db071d75089a11e98aa86eb99d9d7618fc1edce/idna-3.18.tar.gz"
-    sha256 "ffb385a7e039654cef1ab9ef32c6fafe283c0c0467bba1d9029738ce4a14a848"
+    url "https://files.pythonhosted.org/packages/5f/f7/abb373e5757eaec4b922b92f97ec8d6d7e057cf06778247604fbc4e7c3f3/idna-3.19.tar.gz"
+    sha256 "5e0811a4383b21dc5838069f801c4fb62113b7447663d2530d2bd6e77b49bf15"
   end
   resource "jaraco-classes" do
     url "https://files.pythonhosted.org/packages/06/c0/ed4a27bc5571b99e3cff68f8a9fa5b56ff7df1c2251cc715a652ddd26402/jaraco.classes-3.4.0.tar.gz"
@@ -225,12 +225,12 @@ class Omnigent < Formula
     sha256 "48e8f4d9e7e5878571ecf6f2b4e57634f93cd474cc8cfbd2376f2d11b396e30d"
   end
   resource "omnigent-client" do
-    url "https://files.pythonhosted.org/packages/1d/9d/a90e28d2346de633afe507f4eed0a7e8dc65d0a203a65dc4da22e93a9341/omnigent_client-0.10.0.tar.gz"
-    sha256 "9556e97e952ff0952067ad2afa00876956a38912be4e9352b9ffa352cd2f1410"
+    url "https://files.pythonhosted.org/packages/fd/57/41d3a42a2c9d829a3eccd54976720a8d06092393628e19b3d12986746b0f/omnigent_client-0.11.0.tar.gz"
+    sha256 "64e3df85c30deb251b6cede07683a62645e01d19d54ea312075f82a8e33b20b1"
   end
   resource "omnigent-ui-sdk" do
-    url "https://files.pythonhosted.org/packages/0d/cf/854fa248bba60972dba9e734e353caab4c588b92e635bd281a2feabcd1ee/omnigent_ui_sdk-0.10.0.tar.gz"
-    sha256 "4c3886e144047c72d86dd4ac5ac1b4b960ea7212f66f480818a45f032a48a5f7"
+    url "https://files.pythonhosted.org/packages/87/dc/b64fb49182d7f6987a5ee9be3001f51b3e5d50a82c6cd46430544f97c41a/omnigent_ui_sdk-0.11.0.tar.gz"
+    sha256 "0c87d7660ef8ceea776305d679b2416029a00edae46681f040bf3afd891f1b3f"
   end
   resource "openai" do
     url "https://files.pythonhosted.org/packages/49/f5/7c7cb955305cb41f7f3c5fd7e0e38bf6bbf2658468863d4b7b868a5cb8df/openai-2.44.0.tar.gz"
@@ -281,8 +281,8 @@ class Omnigent < Formula
     sha256 "694b793e84f766ba76a90ebdefc01d0a9a045dab0382bee70393da93712ad117"
   end
   resource "pygments" do
-    url "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152d655522fdcebac55e66de6603a76a02bca1b6414f6c/pygments-2.20.0.tar.gz"
-    sha256 "6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"
+    url "https://files.pythonhosted.org/packages/49/2e/ced460408999b33da6b31b0021b0f37d329e202d4169aeb164493778f25b/pygments-2.21.0.tar.gz"
+    sha256 "610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c"
   end
   resource "pyjwt" do
     url "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz"
@@ -297,8 +297,8 @@ class Omnigent < Formula
     sha256 "37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"
   end
   resource "python-dotenv" do
-    url "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz"
-    sha256 "2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3"
+    url "https://files.pythonhosted.org/packages/6a/53/ed9d74092561d4b01a2ef1349d52cdbc135e526c245f366b089cfca6de49/python_dotenv-1.2.3.tar.gz"
+    sha256 "a20a594dabeaa385725aa239d5244871c143ecb356add8a20fcf23773a6c3a35"
   end
   resource "python-multipart" do
     url "https://files.pythonhosted.org/packages/5b/42/55c32bb9b12693c092ad250a0e82edb5b31ddeda6eb772de5f308b3804ad/python_multipart-0.0.32.tar.gz"
@@ -351,8 +351,8 @@ class Omnigent < Formula
     sha256 "d4e3ac5e546444960c710297a3c9fc3f7ebae1b7e963f3d36173b49da535be9b"
   end
   resource "tiktoken" do
-    url "https://files.pythonhosted.org/packages/e4/e5/5f3cb2159769d0f4324c0e9e87f9de3c4b1cd45848a96b2eb3566ad5ca77/tiktoken-0.13.0.tar.gz"
-    sha256 "c9435714c3a84c2319499de9a300c0e604449dd0799ff246458b3bb6a7f433c1"
+    url "https://files.pythonhosted.org/packages/66/62/167a842aa0429d45f5e797354fd4343a96f6043d67d0513c675c7b8d36e6/tiktoken-0.14.0.tar.gz"
+    sha256 "231dec90efcdccf1b565a1416107736f1e09b1a08fe736ef9d6363e626d03874"
   end
   resource "tomlkit" do
     url "https://files.pythonhosted.org/packages/94/96/e07752635b98536177fa1f37671c8f3cdde2e724c6bcf6034b2cfb571565/tomlkit-0.15.1.tar.gz"
@@ -371,8 +371,8 @@ class Omnigent < Formula
     sha256 "dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5"
   end
   resource "typing-inspection" do
-    url "https://files.pythonhosted.org/packages/6d/bc/4eae18cd40c65798a16267572ba346c11f599d44b01603dbd843342042bc/typing_inspection-0.4.3.tar.gz"
-    sha256 "c5f9ec1530b5c1e2c9bc34a84d9a3466ed1b2f3f2fa9f901368d9c5596210e4d"
+    url "https://files.pythonhosted.org/packages/a3/26/b09b8010994eccc3c09092e6b34058f36a460eea2d4c3e8b910c695975a0/typing_inspection-0.4.4.tar.gz"
+    sha256 "547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47"
   end
   resource "tzdata" do
     url "https://files.pythonhosted.org/packages/92/ff/5a28bdfd8c3ebec42564ac7d0e54ca3db65044a9314a97f9564fa7a1e926/tzdata-2026.3.tar.gz"
@@ -383,8 +383,8 @@ class Omnigent < Formula
     sha256 "231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c"
   end
   resource "uvicorn" do
-    url "https://files.pythonhosted.org/packages/03/18/ccce41535dee1be77735592bd19965f3972c82e07ee703d324709496b716/uvicorn-0.52.1.tar.gz"
-    sha256 "112ec661814189acbccd3f7b86460147cc065fc92c0821afa78918780e4354dd"
+    url "https://files.pythonhosted.org/packages/2e/28/64ca011edf31c715b4fad359c587ea52391aaffa125065695590241ff617/uvicorn-0.52.3.tar.gz"
+    sha256 "18857b9e6579300be55c91c0a1cfd37d9a2cf0cabea33b88275f199eb73b8b58"
   end
   resource "uvloop" do
     url "https://files.pythonhosted.org/packages/90/cd/b62bdeaa429758aee8de8b00ac0dd26593a9de93d302bff3d21439e9791d/uvloop-0.22.1-cp314-cp314-macosx_10_13_universal2.whl"
