@@ -44,9 +44,8 @@ export HOMEBREW_NPM_REGISTRY=https://<your-npm-mirror>/
 CI builds and tests bottles for Apple Silicon on macOS Sequoia 15 and Tahoe 26.
 Both builds must produce bottle artifacts before publishing a formula update.
 
-The Intel macOS runner checks formula syntax and audits only. It does not build
-or test an installation, and no Intel bottle is produced. Intel source installs
-remain unverified.
+CI does not run on Intel macOS, and no Intel bottle is produced. Intel source
+installs remain unverified.
 
 ## Documentation
 

@@ -8,11 +8,10 @@ on:
 
 jobs:
   test-bot:
-    name: ${{ matrix.os == 'macos-15-intel' && 'tap syntax/audit (macos-15-intel)' || format('test-bot ({0})', matrix.os) }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-15, macos-15-intel, macos-26 ]
+        os: [ macos-15, macos-26 ]
     runs-on: ${{ matrix.os }}
     permissions:
       actions: read
@@ -48,7 +47,7 @@ jobs:
 
       - run: brew test-bot --only-formulae
         id: formulae
-        if: github.event_name == 'pull_request' && matrix.os != 'macos-15-intel'
+        if: github.event_name == 'pull_request'
 
       - name: Upload bottles as artifact
         if: always() && github.event_name == 'pull_request' && steps.formulae.outputs.testing_formulae != ''
