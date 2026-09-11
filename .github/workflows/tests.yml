@@ -9,8 +9,9 @@ on:
 jobs:
   test-bot:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ macos-15, macos-15-intel, macos-26 ]
+        os: [ macos-15, macos-26 ]
     runs-on: ${{ matrix.os }}
     permissions:
       actions: read
@@ -35,13 +36,23 @@ jobs:
 
       - run: brew test-bot --only-setup
 
-      - run: brew test-bot --only-tap-syntax
+      - name: Check tap style on ARM
+        if: matrix.os == 'macos-15'
+        run: brew style omnigent-ai/tap
+
+      - name: Check tap syntax and audit
+        run: |
+          brew readall --aliases --os=all --arch=all omnigent-ai/tap
+          brew audit --except=installed --tap=omnigent-ai/tap
+
       - run: brew test-bot --only-formulae
+        id: formulae
         if: github.event_name == 'pull_request'
 
       - name: Upload bottles as artifact
-        if: always() && github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request' && steps.formulae.outputs.testing_formulae != ''
         uses: actions/upload-artifact@v4
         with:
           name: bottles_${{ matrix.os }}
           path: '*.bottle.*'
+          if-no-files-found: error

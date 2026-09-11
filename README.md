@@ -39,6 +39,14 @@ export HOMEBREW_PIP_INDEX_URL=https://<your-pypi-mirror>/simple
 export HOMEBREW_NPM_REGISTRY=https://<your-npm-mirror>/
 ```
 
+## CI coverage
+
+CI builds and tests bottles for Apple Silicon on macOS Sequoia 15 and Tahoe 26.
+Both builds must produce bottle artifacts before publishing a formula update.
+
+CI does not run on Intel macOS, and no Intel bottle is produced. Intel source
+installs remain unverified.
+
 ## Documentation
 
 `brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).
