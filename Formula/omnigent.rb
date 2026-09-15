@@ -24,15 +24,9 @@ class Omnigent < Formula
 
   desc "Meta-harness for AI agents"
   homepage "https://github.com/omnigent-ai/omnigent"
-  url "https://files.pythonhosted.org/packages/19/04/d59c355d78f16f78388230931edb11c16c1a20b06a054d33496cc7374889/omnigent-0.13.0.tar.gz"
-  sha256 "8bb7f7defc32447f9ba53855ff3711fa2d71b8d2449d74525113640b5a04a2be"
+  url "https://files.pythonhosted.org/packages/09/09/f1cbc114e9359085038c6a6dbcbf6b18f187194b44e9f6cb14508ecc7483/omnigent-0.14.0.tar.gz"
+  sha256 "6941bcb1a8e2a829b865b1d9ee5d785e835f0ebe2f43031acf51e540173f53e4"
   license "Apache-2.0"
-
-  bottle do
-    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.13.0"
-    sha256 cellar: :any, arm64_tahoe:   "68ac73be1b47b24704763f0aebc872cbb58424ae8e3199e791bce57b61fbef38"
-    sha256 cellar: :any, arm64_sequoia: "4467ee73b2a0ac02435b17ad9ad10eb283049b8d93046dbab189fabe5aef57e1"
-  end
 
   # Most compiled extensions come from upstream wheels (see PREFER_WHEEL in
   # generate_formula.py). jiter, tiktoken and watchfiles still build here, because
@@ -55,8 +49,8 @@ class Omnigent < Formula
   depends_on "tmux"
 
   resource "alembic" do
-    url "https://files.pythonhosted.org/packages/16/2b/e4153978368de59918115c9e01d3ebf58a558a7285efa7e960c383c4b59a/alembic-1.19.1.tar.gz"
-    sha256 "e0fca0518118c78acc493e31bcb5402f190057aaf6df8b5b95ce94c4789cf648"
+    url "https://files.pythonhosted.org/packages/34/10/181eecdd552217d0342492bd6f3b8a96e973083379aace3d3402830ddc03/alembic-1.19.2.tar.gz"
+    sha256 "297950a8a91f6770eb82bfbce9bea55c728b90a5386c6e81430191a319d138b0"
   end
   resource "annotated-doc" do
     url "https://files.pythonhosted.org/packages/5a/8e/38aa427ed5402449e226975b649c5dc73ccadfefeb95e6aecb8f8ea4b6b6/annotated_doc-0.0.5.tar.gz"
@@ -67,8 +61,8 @@ class Omnigent < Formula
     sha256 "13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7"
   end
   resource "anyio" do
-    url "https://files.pythonhosted.org/packages/61/cc/a381afa6efea9f496eff839d4a6a1aed3bfafc7b3ab4b0d1b243a12573dd/anyio-4.14.2.tar.gz"
-    sha256 "cfa139f3ed1a23ee8f88a145ddb5ac7605b8bbfd8592baacd7ce3d8bb4313c7f"
+    url "https://files.pythonhosted.org/packages/a9/d2/f4d173e22df740bc37b1db102b386ba719b66e95b0f0d751f556b387e6d2/anyio-4.15.1.tar.gz"
+    sha256 "9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94"
   end
   resource "argon2-cffi" do
     url "https://files.pythonhosted.org/packages/31/fa/57ec2c6d16ecd2ba0cf15f3c7d1c3c2e7b5fcb83555ff56d7ab10888ec8f/argon2_cffi-23.1.0.tar.gz"
@@ -95,16 +89,16 @@ class Omnigent < Formula
     sha256 "6117b84ea48435e5356dc737f5121485c30920ba43375fa7b434fd753df0eac3"
   end
   resource "claude-agent-sdk" do
-    url "https://files.pythonhosted.org/packages/14/f9/e824f00d9d39036e391aae7f9f36c0a9931e016f14615e4eb8307c1ac551/claude_agent_sdk-0.2.151.tar.gz"
-    sha256 "56a437bbbcc928fd1eae59c3d68b104265f67b23afae3f4497eb433714f82240"
+    url "https://files.pythonhosted.org/packages/49/61/de2194d266fcede2a737996e800e7726079730f81ef03d41117e7888be04/claude_agent_sdk-0.2.152.tar.gz"
+    sha256 "0822bbdf700ccdd1acecf8365345a56bde07833afe7f8bd1bee68cba0e2fcf9a"
   end
   resource "click" do
     url "https://files.pythonhosted.org/packages/c7/0e/7fa0ef50764b67090eca4114772a2abf8b6148198475e54c660b97caeee6/click-8.5.0.tar.gz"
     sha256 "ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34"
   end
   resource "cursor-sdk" do
-    url "https://files.pythonhosted.org/packages/53/3f/5f3cd42cb51cd916a7abed6c918b20da338c7a8d57a99f06457987719be3/cursor_sdk-1.0.30.tar.gz"
-    sha256 "f699bb9e72f95ebbdbc94ecfda0958323437c155baf6c4e623699e8caef4dfa2"
+    url "https://files.pythonhosted.org/packages/82/ca/60a7ea6a8b08a430a499797261487cf9114fbbfb652e10379a1f98dde463/cursor_sdk-1.0.31.tar.gz"
+    sha256 "fcdd279852d0b3eea4e4c4562dcd1c7d18360f507d2830bd2de79b6d855276a5"
   end
   resource "distro" do
     url "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz"
@@ -113,6 +107,10 @@ class Omnigent < Formula
   resource "fastapi" do
     url "https://files.pythonhosted.org/packages/8a/02/91e3416a8fdd715abb903a952a6bec7cdd8d14eed55d415fc8595524c319/fastapi-0.141.1.tar.gz"
     sha256 "e8822fc40db1e1858054d7a949a888695bc9bdce70139178e33bd2871a453ca1"
+  end
+  resource "filelock" do
+    url "https://files.pythonhosted.org/packages/0a/a0/50c2c0ce5e74d7721bbb1b19a26ebd339aac5878553a6e35308c2f31f935/filelock-3.32.5.tar.gz"
+    sha256 "f6a6a28f743f9b95ce19db5abe0f376f75eb56517dff21e1a4751e2657d3e83d"
   end
   resource "ftfy" do
     url "https://files.pythonhosted.org/packages/a5/d3/8650919bc3c7c6e90ee3fa7fd618bf373cbbe55dff043bd67353dbb20cd8/ftfy-6.3.1.tar.gz"
@@ -133,8 +131,8 @@ class Omnigent < Formula
     sha256 "adb4bae02e91a8e863e48b177e4014bdcac8a6b5e047ea1df687a61534b85e6c"
   end
   resource "griffelib" do
-    url "https://files.pythonhosted.org/packages/f0/b4/a767e91c606deefc447a96eaf59edd77397960b1d677dffd833ee8449831/griffelib-2.2.0.tar.gz"
-    sha256 "e1bc36fe9cd21d4b6b659b456346755e4cfdc5676c0a5214083126ee12612b3c"
+    url "https://files.pythonhosted.org/packages/27/af/018c10bc9edd42b6ef6db2e96b09542050d5253f9b195e74bc910b2d13ab/griffelib-2.3.0.tar.gz"
+    sha256 "7b0952caf5bca6afa4bb5ee8c6a2d183fe3f21b62efc5f6c7243cb2b26d2d115"
   end
   resource "h11" do
     url "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz"
@@ -219,8 +217,8 @@ class Omnigent < Formula
     end
   end
   resource "mcp" do
-    url "https://files.pythonhosted.org/packages/b5/48/0bb26fdfe7ac16875f534a101ce2405eae192bdef37e7451f2f4507c13ec/mcp-1.29.1.tar.gz"
-    sha256 "1967ba4c315f7a375146209949f45950d18b0efd2f913d7cf3400bc723ee5f04"
+    url "https://files.pythonhosted.org/packages/ba/93/0142dc84a666daf8ad51a34268f34c12fd6fda4f3810c4be2504eecc8212/mcp-1.30.0.tar.gz"
+    sha256 "445414625fce5c295faa505bb11bacece661ab6f4028d57c935db57820b7a3e4"
   end
   resource "mdurl" do
     url "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz"
@@ -231,12 +229,12 @@ class Omnigent < Formula
     sha256 "48e8f4d9e7e5878571ecf6f2b4e57634f93cd474cc8cfbd2376f2d11b396e30d"
   end
   resource "omnigent-client" do
-    url "https://files.pythonhosted.org/packages/20/e6/a5f1bd97e337c04729d4602552c336db25ac4767044676491dcad40d4478/omnigent_client-0.13.0.tar.gz"
-    sha256 "e73d6b947ede630e9fa6741f2fe98554e74bdf491f59462531c9500a76249cee"
+    url "https://files.pythonhosted.org/packages/cf/30/abfbf697f49dc9c67c2540615951b7032110b90a98e65bd9d26fd50741aa/omnigent_client-0.14.0.tar.gz"
+    sha256 "76e6a0739ea614865832ed0020b12e035fd1d3f95cbc10812501afcdd9453aa6"
   end
   resource "omnigent-ui-sdk" do
-    url "https://files.pythonhosted.org/packages/31/ed/b378e07bd12146110e40c15cbe4b01d60d68163457fb65e2c8ed45c6020f/omnigent_ui_sdk-0.13.0.tar.gz"
-    sha256 "07a1309f893f88075fad62b0a76cc27f11d96912e552ebbe3ad55e92a42b0b55"
+    url "https://files.pythonhosted.org/packages/0e/d5/5a66337b2609082569576213cbd550bbdb5f68ad3e4537f976ed89886373/omnigent_ui_sdk-0.14.0.tar.gz"
+    sha256 "8a326e8126ffe66c5ca9d720d9c3675f6dff7b2880ecec734da1a820e44cc237"
   end
   resource "openai" do
     url "https://files.pythonhosted.org/packages/49/f5/7c7cb955305cb41f7f3c5fd7e0e38bf6bbf2658468863d4b7b868a5cb8df/openai-2.44.0.tar.gz"
@@ -355,8 +353,8 @@ class Omnigent < Formula
     sha256 "5e2d46356ac2ccb7d268ab6c2319ac6a2b42f1b8d5fd8bd3d46855cd82abee97"
   end
   resource "sse-starlette" do
-    url "https://files.pythonhosted.org/packages/f8/00/b42a44342a054d58cb1115d7c8aa9cb4290dd9442f9c1b91a4b8173dba22/sse_starlette-3.4.8.tar.gz"
-    sha256 "ed89ffbb75cbf78a5fe2f2109cd584792ee7f9dfac96f791db546df8f15f3f9c"
+    url "https://files.pythonhosted.org/packages/2b/54/6767bb789b2f2fed6e0f953df949cd39dc263a384c1b65a95232598621d6/sse_starlette-3.4.11.tar.gz"
+    sha256 "1bae716c02f3e6f294be41ff333220692dae7c3cbab077c900f159676719dade"
   end
   resource "starlette" do
     url "https://files.pythonhosted.org/packages/b5/b4/205b0d5241d934e8add0c38aa924c4f9fb7330834ff11e5444db964ec3f9/starlette-1.6.0.tar.gz"
@@ -375,8 +373,8 @@ class Omnigent < Formula
     sha256 "55b0b0dbd97462d06ebee91e4dac24ed4d4702be82b24f07e6c1d27e08cea220"
   end
   resource "types-requests" do
-    url "https://files.pythonhosted.org/packages/db/51/703318f7b7be8bee126ec13bf615050f932d0179b8784420f3a0199cc769/types_requests-2.33.0.20260712.tar.gz"
-    sha256 "2141b67ab534a5c5cd2dac5034f2a35f42e699c5bf185eee608c5246a069d7fb"
+    url "https://files.pythonhosted.org/packages/c0/18/4c2c0290953f8b3b9612adfcb07b57f144ade3ad32a76764fca42b77c5f3/types_requests-2.33.0.20260906.tar.gz"
+    sha256 "76ab8a0fb736744a0c3deee7aa57b2927e301f078d9e61f5391b3e92002416b9"
   end
   resource "typing-extensions" do
     url "https://files.pythonhosted.org/packages/f6/cc/6253133b5bb138fc3306cebfbda2c520f545d36b5be2c7255cc528bb45d6/typing_extensions-4.16.0.tar.gz"
@@ -426,14 +424,6 @@ class Omnigent < Formula
   end
 
   def install
-    # Homebrew honours HOMEBREW_PIP_INDEX_URL only when downloading the resource
-    # archives themselves. Building an sdist then shells out to a second, isolated
-    # pip that resolves the build backend (`setuptools`, ...) from *its own* index,
-    # which defaults to https://pypi.org/simple. `brew` re-execs through `env -i`
-    # with an allowlist and builds run with a scrubbed HOME, so neither a
-    # PIP_INDEX_URL export nor ~/.config/pip/pip.conf reaches that child. Forward
-    # the mirror explicitly, or every sdist resource fails to build its wheel
-    # wherever pypi.org itself is unreachable.
     if Homebrew::EnvConfig.non_default_variable?(:HOMEBREW_PIP_INDEX_URL) &&
        (pip_index_url = Homebrew::EnvConfig.pip_index_url.presence)
       ENV["PIP_INDEX_URL"] = pip_index_url
@@ -447,12 +437,6 @@ class Omnigent < Formula
     # Linux ld). Everything else compiled is a prebuilt wheel.
     ENV.append_to_rustflags "-C link-args=-Wl,-headerpad_max_install_names" if OS.mac?
 
-    # Those same three sdists fetch their crates from index.crates.io, and Homebrew has no
-    # equivalent of HOMEBREW_PIP_INDEX_URL for cargo. `brew` re-execs through `env -i` with
-    # an allowlist, so a CARGO_* export cannot reach the build, and builds run with a
-    # scrubbed HOME, so ~/.cargo/config.toml is invisible too. Write the source replacement
-    # into the buildpath and point CARGO_HOME at it, or the Rust resources cannot build
-    # wherever index.crates.io is unreachable.
     if (cargo_index = ENV.fetch("HOMEBREW_CARGO_INDEX_URL", nil).presence)
       (buildpath/".cargo").mkpath
       (buildpath/".cargo/config.toml").write <<~TOML
