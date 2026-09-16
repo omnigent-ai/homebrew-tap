@@ -28,6 +28,12 @@ class Omnigent < Formula
   sha256 "6941bcb1a8e2a829b865b1d9ee5d785e835f0ebe2f43031acf51e540173f53e4"
   license "Apache-2.0"
 
+  bottle do
+    root_url "https://github.com/omnigent-ai/homebrew-tap/releases/download/omnigent-0.14.0"
+    sha256 cellar: :any, arm64_tahoe:   "0c2bb0a095d3bbaeb022322fb92d68a2610c10d20bc13e98f12ccdc72ba3beb0"
+    sha256 cellar: :any, arm64_sequoia: "487d0e9de17d9964906e46078a2ccf03262b7adb08cdbb1b085aca69f5973547"
+  end
+
   # Most compiled extensions come from upstream wheels (see PREFER_WHEEL in
   # generate_formula.py). jiter, tiktoken and watchfiles still build here, because
   # their maturin wheels have no Mach-O install-name padding and Homebrew cannot
